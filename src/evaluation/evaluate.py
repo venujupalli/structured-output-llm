@@ -6,11 +6,16 @@ import logging
 import os
 from pathlib import Path
 
-import mlflow
 from datasets import load_dataset
 from jsonschema import ValidationError, validate
-from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from peft import PeftModel
+
+try:
+    import mlflow
+except ImportError:  # pragma: no cover - optional runtime dependency
+    mlflow = None
 
 from src.evaluation.metrics import EvalMetrics
 from src.utils.config import load_yaml
@@ -25,6 +30,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--training-config", required=True)
     parser.add_argument("--schema-config", required=True)
     parser.add_argument("--output-report", required=True)
+    parser.add_argument("--adapter-path", default=None)
+    parser.add_argument("--eval-data-path", default=None)
     return parser.parse_args()
 
 
@@ -50,24 +57,33 @@ def main() -> None:
     train_cfg = load_yaml(args.training_config)
     schema_cfg = load_yaml(args.schema_config)
 
-    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
-    if mlflow_uri:
-        mlflow.set_tracking_uri(mlflow_uri)
-    mlflow.set_experiment(train_cfg["mlflow"]["experiment_name"])
+    if mlflow:
+        mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
+        if mlflow_uri:
+            mlflow.set_tracking_uri(mlflow_uri)
+        mlflow.set_experiment(train_cfg["mlflow"]["experiment_name"])
 
-    tokenizer = AutoTokenizer.from_pretrained(train_cfg["output_dir"] + "/adapter")
-    base_model = AutoModelForCausalLM.from_pretrained(model_cfg["model_name"], device_map="auto")
-    model = PeftModel.from_pretrained(base_model, train_cfg["output_dir"] + "/adapter")
+    adapter_path = args.adapter_path or (train_cfg["output_dir"] + "/adapter")
 
-    eval_data = load_dataset("json", data_files=train_cfg["dataset"]["eval_path"], split="train")
+    tokenizer_path = adapter_path if Path(adapter_path).exists() else model_cfg["model_name"]
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    model = AutoModelForCausalLM.from_pretrained(model_cfg["model_name"], device_map="auto")
+
+    if Path(adapter_path).exists():
+        model = PeftModel.from_pretrained(model, adapter_path)
+        LOGGER.info("Loaded adapter from %s", adapter_path)
+    else:
+        LOGGER.info("Adapter not found at %s; evaluating base model only.", adapter_path)
+
+    eval_data_path = args.eval_data_path or train_cfg["dataset"]["eval_path"]
+    eval_data = load_dataset("json", data_files=eval_data_path, split="train")
     schema = schema_cfg["schema"]
     required_fields = schema.get("required", [])
 
     metrics = EvalMetrics(total=len(eval_data))
     detailed = []
 
-    with mlflow.start_run(run_name=train_cfg["mlflow"].get("eval_run_name", "qwen-qlora-eval")):
-        for row in eval_data:
+    for row in eval_data:
             prompt = build_prompt(row["instruction"], row.get("input", ""))
             inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
             generated = model.generate(**inputs, max_new_tokens=train_cfg.get("eval_max_new_tokens", 256))
@@ -103,21 +119,26 @@ def main() -> None:
 
             detailed.append(result)
 
-        report = {
-            "metrics": metrics.to_dict(),
-            "samples": detailed,
-        }
+    report = {
+        "metrics": metrics.to_dict(),
+        "samples": detailed,
+    }
 
-        output_report = Path(args.output_report)
-        output_report.parent.mkdir(parents=True, exist_ok=True)
-        output_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    output_report = Path(args.output_report)
+    output_report.parent.mkdir(parents=True, exist_ok=True)
+    output_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
-        for key, value in report["metrics"].items():
-            if isinstance(value, (float, int)):
-                mlflow.log_metric(key, value)
+    if mlflow:
+        with mlflow.start_run(run_name=train_cfg["mlflow"].get("eval_run_name", "qwen-qlora-eval")):
+            for key, value in report["metrics"].items():
+                if isinstance(value, (float, int)):
+                    mlflow.log_metric(key, value)
 
-        mlflow.log_artifact(str(output_report), artifact_path="evaluation")
-        LOGGER.info("Evaluation report written to %s", output_report)
+            mlflow.log_artifact(str(output_report), artifact_path="evaluation")
+    else:
+        LOGGER.warning("mlflow is not installed; skipping experiment tracking.")
+
+    LOGGER.info("Evaluation report written to %s", output_report)
 
 
 if __name__ == "__main__":
