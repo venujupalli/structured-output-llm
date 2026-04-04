@@ -1,0 +1,17 @@
+generation:
+  seed: 20260404
+  synthetic_samples: 3000
+  golden_samples: 160
+  val_ratio: 0.1
+  batch_size: 128
+  max_retries: 4
+  save_json_copy: true
+
+paths:
+  schema_config: configs/schema_config.yaml
+  synthetic_train_jsonl: data/synthetic/train.jsonl
+  synthetic_val_jsonl: data/synthetic/val.jsonl
+  golden_jsonl: data/golden/golden.jsonl
+  synthetic_train_json: data/synthetic/train.json
+  synthetic_val_json: data/synthetic/val.json
+  golden_json: data/golden/golden.json
