@@ -1,50 +1,65 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: qlora-evaluation-job
+  name: llm-evaluation-job
+  labels:
+    app.kubernetes.io/name: structured-output-llm
+    app.kubernetes.io/component: evaluation
 spec:
-  backoffLimit: 2
+  backoffLimit: 3
+  completions: 1
+  parallelism: 1
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: structured-output-llm
+        app.kubernetes.io/component: evaluation
     spec:
       restartPolicy: Never
+      nodeSelector:
+        accelerator: nvidia
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
       containers:
         - name: evaluator
           image: your-registry/structured-output-llm:latest
           imagePullPolicy: IfNotPresent
-          command: ["/app/docker/entrypoint.sh", "evaluate"]
-          args:
-            - --model-config
-            - /app/configs/model_config.yaml
-            - --training-config
-            - /app/configs/training_config.yaml
-            - --schema-config
-            - /app/configs/schema_config.yaml
-            - --output-report
-            - /mnt/output/evaluation/report.json
+          command: ["bash", "-c", "python src/evaluation/evaluator.py"]
           env:
+            - name: MODEL_PATH
+              value: "/models/latest"
+            - name: TEST_DATA_PATH
+              value: "/data/test.jsonl"
+            - name: GOLDEN_DATA_PATH
+              value: "/data/golden.jsonl"
             - name: MLFLOW_TRACKING_URI
-              valueFrom:
-                secretKeyRef:
-                  name: mlflow-config
-                  key: tracking_uri
+              value: "http://mlflow:5000"
           resources:
             requests:
+              cpu: "1"
+              memory: "4Gi"
+              nvidia.com/gpu: "1"
+            limits:
               cpu: "2"
               memory: "8Gi"
               nvidia.com/gpu: "1"
-            limits:
-              cpu: "4"
-              memory: "16Gi"
-              nvidia.com/gpu: "1"
           volumeMounts:
-            - name: data-volume
-              mountPath: /mnt/data
-            - name: output-volume
-              mountPath: /mnt/output
+            - name: dataset-volume
+              mountPath: /data
+            - name: model-artifacts-volume
+              mountPath: /models
+            - name: config-volume
+              mountPath: /config
+              readOnly: true
       volumes:
-        - name: data-volume
+        - name: dataset-volume
           persistentVolumeClaim:
-            claimName: llm-data-pvc
-        - name: output-volume
+            claimName: llm-dataset-pvc
+        - name: model-artifacts-volume
           persistentVolumeClaim:
-            claimName: llm-output-pvc
+            claimName: llm-models-pvc
+        - name: config-volume
+          configMap:
+            name: llm-pipeline-config
