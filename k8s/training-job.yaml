@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/component: training
 spec:
   backoffLimit: 3
+  ttlSecondsAfterFinished: 600
   completions: 1
   parallelism: 1
   template:
@@ -16,47 +17,36 @@ spec:
         app.kubernetes.io/component: training
     spec:
       restartPolicy: Never
-      nodeSelector:
-        accelerator: nvidia
-      tolerations:
-        - key: nvidia.com/gpu
-          operator: Exists
-          effect: NoSchedule
       containers:
         - name: trainer
-          image: your-registry/structured-output-llm:latest
-          imagePullPolicy: IfNotPresent
-          command: ["bash", "-c", "python src/training/train.py"]
+          image: structured-output-llm:latest
+          imagePullPolicy: Never
+          command:
+            - /app/docker/entrypoint.sh
+            - train
+            - --model-config
+            - /config/model_config.k8s.yaml
+            - --training-config
+            - /config/training_config.yaml
+            - --override-config
+            - /config/training_config.k8s.yaml
           env:
-            - name: MLFLOW_TRACKING_URI
-              value: "http://mlflow:5000"
-            - name: MODEL_NAME
-              value: "llm-model"
-            - name: DATA_PATH
-              value: "/data"
-            - name: CONFIG_PATH
-              value: "/config/training_config.yaml"
+            - name: TRANSFORMERS_CACHE
+              value: /models/cache
           resources:
             requests:
-              cpu: "2"
-              memory: "8Gi"
-              nvidia.com/gpu: "1"
+              cpu: "250m"
+              memory: "512Mi"
             limits:
-              cpu: "4"
-              memory: "16Gi"
-              nvidia.com/gpu: "1"
+              cpu: "2"
+              memory: "3Gi"
           volumeMounts:
-            - name: dataset-volume
-              mountPath: /data
             - name: model-artifacts-volume
               mountPath: /models
             - name: config-volume
               mountPath: /config
               readOnly: true
       volumes:
-        - name: dataset-volume
-          persistentVolumeClaim:
-            claimName: llm-dataset-pvc
         - name: model-artifacts-volume
           persistentVolumeClaim:
             claimName: llm-models-pvc

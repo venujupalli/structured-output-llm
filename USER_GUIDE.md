@@ -7,14 +7,13 @@ This guide explains how to prepare a Kubernetes cluster and run training/evaluat
 Make sure you have:
 
 - A Kubernetes cluster you can access with `kubectl`.
-- At least one GPU-capable node (the jobs request `nvidia.com/gpu: "1"`).
 - Docker installed (for building/pushing your image).
 - Permissions to create namespaces, PVCs, and Jobs in the cluster.
 
 Project defaults used by `make`:
 
 - `NAMESPACE=llm-training`
-- `IMAGE_NAME=llm-training`
+- `IMAGE_NAME=structured-output-llm`
 - `DOCKER_TAG=latest`
 
 You can override any of these per command, for example:
@@ -33,16 +32,13 @@ The Kubernetes manifests reference an image that you must publish to a registry 
    make build IMAGE_NAME=<registry>/<repo>/structured-output-llm DOCKER_TAG=<tag>
    ```
 
-2. Push the image:
+2. Push the image if your cluster cannot read your local Docker images:
 
    ```bash
    make push IMAGE_NAME=<registry>/<repo>/structured-output-llm DOCKER_TAG=<tag>
    ```
 
-3. Update both manifests to the same image/tag:
-
-- `k8s/training-job.yaml` → `spec.template.spec.containers[0].image`
-- `k8s/evaluation-job.yaml` → `spec.template.spec.containers[0].image`
+For Docker Desktop Kubernetes, the default local image `structured-output-llm:latest` can be used directly after a local build.
 
 ## 3) Prepare Kubernetes Manifests
 
@@ -50,10 +46,9 @@ Before deploying, validate these key settings:
 
 ### Storage
 
-`k8s/pvc.yaml` defines two PVCs:
+`k8s/pvc.yaml` defines one PVC:
 
-- `llm-dataset-pvc` (100Gi, ReadWriteMany)
-- `llm-models-pvc` (200Gi, ReadWriteMany)
+- `llm-models-pvc` (20Gi, ReadWriteOnce)
 
 Update storage class / access mode if your cluster requires different settings.
 
@@ -62,39 +57,24 @@ Update storage class / access mode if your cluster requires different settings.
 `k8s/training-job.yaml` uses:
 
 - Job name: `llm-training-job`
-- Command: `python src/training/train.py`
+- Command: `/app/docker/entrypoint.sh train ...`
 - Config/data mounts:
-  - `/data` from `llm-dataset-pvc`
+  - repo-bundled synthetic data from `/app/data/synthetic/*.jsonl`
   - `/models` from `llm-models-pvc`
   - `/config` from ConfigMap `llm-pipeline-config`
-- GPU node selector and toleration:
-  - `nodeSelector: { accelerator: nvidia }`
-  - toleration for key `nvidia.com/gpu`
+- Uses `configs/model_config.k8s.yaml` and `configs/training_config.k8s.yaml` for a lightweight Kubernetes smoke deployment.
 
 ### Evaluation Job
 
 `k8s/evaluation-job.yaml` uses:
 
 - Job name: `llm-evaluation-job`
-- Command currently set to: `python src/evaluation/evaluator.py`
-- Mounted volumes are the same as training (`/data`, `/models`, `/config`)
-
-> Note: The repository’s module entry point is `src/evaluation/evaluate.py`. If your image does not include `src/evaluation/evaluator.py`, update the command in the evaluation manifest before deployment.
+- Command: `/app/docker/entrypoint.sh evaluate ...`
+- Mounted volumes are `/models` and `/config`
 
 ### ConfigMap dependency
 
-Both jobs mount a ConfigMap named `llm-pipeline-config`. Create it before running jobs.
-
-Example:
-
-```bash
-kubectl create configmap llm-pipeline-config \
-  -n <namespace> \
-  --from-file=configs/training_config.yaml \
-  --from-file=configs/model_config.yaml \
-  --from-file=configs/schema_config.yaml \
-  --dry-run=client -o yaml | kubectl apply -f -
-```
+The `k8s/kustomization.yaml` bundle includes the `llm-pipeline-config` ConfigMap automatically when you run the `make` targets below.
 
 ## 4) Set Up the Cluster Namespace
 
@@ -123,6 +103,18 @@ Or deploy all resources at once:
 
 ```bash
 make deploy-all NAMESPACE=<namespace>
+```
+
+`deploy-all` now applies storage, config, and the training job. Run evaluation after training completes:
+
+```bash
+make deploy-eval NAMESPACE=<namespace>
+```
+
+If you want to evaluate the base model without any adapter, use:
+
+```bash
+make deploy-eval-base NAMESPACE=<namespace>
 ```
 
 ## 6) Run / Re-run Jobs Safely

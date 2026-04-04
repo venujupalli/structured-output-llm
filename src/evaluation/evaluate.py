@@ -8,6 +8,7 @@ from pathlib import Path
 
 from datasets import load_dataset
 from jsonschema import ValidationError, validate
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from peft import PeftModel
@@ -33,6 +34,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--adapter-path", default=None)
     parser.add_argument("--eval-data-path", default=None)
     return parser.parse_args()
+
+
+def build_model_kwargs(model_cfg: dict) -> dict:
+    kwargs = {
+        "trust_remote_code": model_cfg.get("trust_remote_code", False),
+    }
+    if model_cfg.get("load_in_4bit", False):
+        quant_cfg = model_cfg.get("quantization", {})
+        kwargs["quantization_config"] = {
+            "load_in_4bit": True,
+            "bnb_4bit_quant_type": quant_cfg.get("bnb_4bit_quant_type", "nf4"),
+            "bnb_4bit_compute_dtype": getattr(
+                torch,
+                quant_cfg.get("bnb_4bit_compute_dtype", "bfloat16"),
+            ),
+            "bnb_4bit_use_double_quant": quant_cfg.get("bnb_4bit_use_double_quant", True),
+        }
+        kwargs["device_map"] = model_cfg.get("device_map", "auto")
+    return kwargs
 
 
 def build_prompt(instruction: str, user_input: str) -> str:
@@ -67,7 +87,12 @@ def main() -> None:
 
     tokenizer_path = adapter_path if Path(adapter_path).exists() else model_cfg["model_name"]
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-    model = AutoModelForCausalLM.from_pretrained(model_cfg["model_name"], device_map="auto")
+    model_kwargs = build_model_kwargs(model_cfg)
+    if "quantization_config" in model_kwargs:
+        from transformers import BitsAndBytesConfig
+
+        model_kwargs["quantization_config"] = BitsAndBytesConfig(**model_kwargs["quantization_config"])
+    model = AutoModelForCausalLM.from_pretrained(model_cfg["model_name"], **model_kwargs)
 
     if Path(adapter_path).exists():
         model = PeftModel.from_pretrained(model, adapter_path)

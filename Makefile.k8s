@@ -1,7 +1,7 @@
-.PHONY: setup namespace apply-pvc deploy-training deploy-eval deploy-all run-training run-eval run-all logs-training logs-eval status describe-training describe-eval clean clean-all
+.PHONY: setup namespace apply-pvc apply-config deploy-training deploy-eval deploy-eval-base deploy-all run-training run-eval run-eval-base run-all logs-training logs-eval status describe-training describe-eval clean clean-all
 
-TRAINING_JOB_NAME ?= training
-EVAL_JOB_NAME ?= evaluation
+TRAINING_JOB_NAME ?= llm-training-job
+EVAL_JOB_NAME ?= llm-evaluation-job
 
 setup: ## Verify kubectl/cluster and create namespace
 	@echo "[setup] Checking kubectl installation"
@@ -20,16 +20,24 @@ apply-pvc: ## Apply persistent volume claim
 	@echo "[apply-pvc] Applying PVC from $(K8S_DIR)/pvc.yaml"
 	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/pvc.yaml
 
+apply-config: ## Apply generated ConfigMap
+	@echo "[apply-config] Applying ConfigMap from $(K8S_DIR)/llm-pipeline-config.yaml"
+	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/llm-pipeline-config.yaml
+
 deploy-training: ## Deploy training job manifest
-	@echo "[deploy-training] Applying $(K8S_DIR)/training-job.yaml"
+	@echo "[deploy-training] Applying training job from $(K8S_DIR)/training-job.yaml"
 	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/training-job.yaml
 
 deploy-eval: ## Deploy evaluation job manifest
-	@echo "[deploy-eval] Applying $(K8S_DIR)/evaluation-job.yaml"
+	@echo "[deploy-eval] Applying evaluation job from $(K8S_DIR)/evaluation-job.yaml"
 	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/evaluation-job.yaml
 
-deploy-all: apply-pvc deploy-training deploy-eval ## Deploy PVC, training, and evaluation manifests
-	@echo "[deploy-all] Applied all Kubernetes resources"
+deploy-eval-base: ## Deploy base-model evaluation job manifest
+	@echo "[deploy-eval-base] Applying base-model evaluation job from $(K8S_DIR)/evaluation-job-base.yaml"
+	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/evaluation-job-base.yaml
+
+deploy-all: apply-pvc apply-config deploy-training ## Deploy dependencies and training job
+	@echo "[deploy-all] Training resources applied. Run deploy-eval after training completes."
 
 run-training: ## Recreate and run training job
 	@echo "[run-training] Recreating job $(TRAINING_JOB_NAME)"
@@ -40,6 +48,11 @@ run-eval: ## Recreate and run evaluation job
 	@echo "[run-eval] Recreating job $(EVAL_JOB_NAME)"
 	@kubectl delete job $(EVAL_JOB_NAME) -n $(NAMESPACE) --ignore-not-found
 	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/evaluation-job.yaml
+
+run-eval-base: ## Recreate and run base-model evaluation job
+	@echo "[run-eval-base] Recreating base-model evaluation job llm-base-evaluation-job"
+	@kubectl delete job llm-base-evaluation-job -n $(NAMESPACE) --ignore-not-found
+	@kubectl apply -n $(NAMESPACE) -f $(K8S_DIR)/evaluation-job-base.yaml
 
 run-all: run-training run-eval ## Run training then evaluation jobs
 	@echo "[run-all] Triggered training and evaluation jobs"

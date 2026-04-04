@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-pipeline-config
+  labels:
+    app.kubernetes.io/name: structured-output-llm
+    app.kubernetes.io/component: config
+data:
+  model_config.yaml: |
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    cache_dir: null
+    load_in_4bit: true
+    device_map: auto
+    trust_remote_code: false
+    max_retries: 3
+    retry_backoff_seconds: 2
+    lora:
+      r: 16
+      lora_alpha: 32
+      lora_dropout: 0.05
+      target_modules:
+        - q_proj
+        - k_proj
+        - v_proj
+        - o_proj
+    quantization:
+      bnb_4bit_quant_type: nf4
+      bnb_4bit_compute_dtype: bfloat16
+      bnb_4bit_use_double_quant: true
+  model_config.k8s.yaml: |
+    model_name: sshleifer/tiny-gpt2
+    cache_dir: /models/cache
+    load_in_4bit: false
+    device_map: cpu
+    trust_remote_code: false
+    max_retries: 3
+    retry_backoff_seconds: 2
+    lora:
+      r: 4
+      lora_alpha: 8
+      lora_dropout: 0.05
+      target_modules:
+        - c_attn
+    quantization:
+      bnb_4bit_quant_type: nf4
+      bnb_4bit_compute_dtype: float32
+      bnb_4bit_use_double_quant: false
+  training_config.yaml: |
+    seed: 42
+    output_dir: /mnt/output/qwen25-structured
+    max_seq_length: 1024
+    num_train_epochs: 3
+    per_device_train_batch_size: 2
+    gradient_accumulation_steps: 8
+    learning_rate: 2e-4
+    logging_steps: 10
+    save_steps: 100
+    save_total_limit: 3
+    bf16: true
+    fp16: false
+    optimizer: paged_adamw_8bit
+    lr_scheduler_type: cosine
+    warmup_ratio: 0.03
+    packing: false
+    eval_max_new_tokens: 256
+    dataset:
+      train_path: /mnt/data/train.json
+      eval_path: /mnt/data/eval.json
+    mlflow:
+      experiment_name: structured-output-llm
+      run_name: qwen25-qlora-train
+      eval_run_name: qwen25-qlora-eval
+  training_config.k8s.yaml: |
+    seed: 42
+    output_dir: /models/latest
+    max_seq_length: 128
+    num_train_epochs: 1
+    per_device_train_batch_size: 1
+    gradient_accumulation_steps: 1
+    learning_rate: 5e-4
+    logging_steps: 1
+    save_steps: 10
+    save_total_limit: 1
+    bf16: false
+    fp16: false
+    optimizer: adamw_torch
+    lr_scheduler_type: cosine
+    warmup_ratio: 0.03
+    packing: false
+    eval_max_new_tokens: 64
+    dataset:
+      train_path: /app/data/synthetic/train.jsonl
+      eval_path: /app/data/synthetic/val.jsonl
+    mlflow:
+      experiment_name: structured-output-llm-k8s
+      run_name: tiny-gpt2-train
+      eval_run_name: tiny-gpt2-eval
+  schema_config.yaml: |
+    schema:
+      type: object
+      required:
+        - order_id
+        - customer_name
+        - items
+        - total_amount
+        - shipping_address
+        - order_date
+      properties:
+        order_id:
+          type: string
+        customer_name:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - product_name
+              - quantity
+              - price
+            properties:
+              product_name:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: number
+        total_amount:
+          type: number
+        shipping_address:
+          type: string
+        order_date:
+          type: string

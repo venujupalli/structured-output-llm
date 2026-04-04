@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-IMAGE_NAME ?= llm-training
+IMAGE_NAME ?= structured-output-llm
 DOCKER_TAG ?= latest
 NAMESPACE ?= llm-training
 K8S_DIR ?= k8s

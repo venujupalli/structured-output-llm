@@ -1,10 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: llm-evaluation-job
+  name: llm-base-evaluation-job
   labels:
     app.kubernetes.io/name: structured-output-llm
     app.kubernetes.io/component: evaluation
+    app.kubernetes.io/variant: base-model
 spec:
   backoffLimit: 3
   ttlSecondsAfterFinished: 600
@@ -15,6 +16,7 @@ spec:
       labels:
         app.kubernetes.io/name: structured-output-llm
         app.kubernetes.io/component: evaluation
+        app.kubernetes.io/variant: base-model
     spec:
       restartPolicy: Never
       containers:
@@ -31,11 +33,11 @@ spec:
             - --schema-config
             - /config/schema_config.yaml
             - --adapter-path
-            - /models/latest/adapter
+            - /models/__base_model_only__/adapter
             - --eval-data-path
             - /app/data/synthetic/val.jsonl
             - --output-report
-            - /models/latest/evaluation/report.json
+            - /models/base-evaluation/report.json
           env:
             - name: TRANSFORMERS_CACHE
               value: /models/cache
