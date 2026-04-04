@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: qlora-training-job
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: your-registry/structured-output-llm:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/app/docker/entrypoint.sh", "train"]
+          args:
+            - --model-config
+            - /app/configs/model_config.yaml
+            - --training-config
+            - /app/configs/training_config.yaml
+          env:
+            - name: MLFLOW_TRACKING_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-config
+                  key: tracking_uri
+          resources:
+            requests:
+              cpu: "4"
+              memory: "16Gi"
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "8"
+              memory: "32Gi"
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /mnt/data
+            - name: output-volume
+              mountPath: /mnt/output
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: llm-data-pvc
+        - name: output-volume
+          persistentVolumeClaim:
+            claimName: llm-output-pvc
