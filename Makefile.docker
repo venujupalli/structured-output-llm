@@ -1,0 +1,12 @@
+.PHONY: build push build-push
+
+build: ## Build Docker image
+	@echo "[build] Building image $(IMAGE_NAME):$(DOCKER_TAG)"
+	@docker build -f docker/Dockerfile -t $(IMAGE_NAME):$(DOCKER_TAG) .
+
+push: ## Push Docker image to registry
+	@echo "[push] Pushing image $(IMAGE_NAME):$(DOCKER_TAG)"
+	@docker push $(IMAGE_NAME):$(DOCKER_TAG)
+
+build-push: build push ## Build and push Docker image
+	@echo "[build-push] Completed build and push for $(IMAGE_NAME):$(DOCKER_TAG)"
