@@ -1,0 +1,802 @@
+[
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00001 for Avery Johnson includes 1 x wireless mouse @ $19.99. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-01-01. Total charged: $19.99.",
+    "output": "{\"order_id\": \"GLD-00001\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 19.99, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00002). got 2 x mechanical keyboard @ $27.49, 3 x usb-c hub @ $34.99; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $159.95 on 2025-01-02",
+    "output": "{\"order_id\": \"GLD-00002\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 27.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 159.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00003 name=Miguel Torres items:[3 x usb-c hub @ $34.99, 4 x noise-cancelling headphones @ $42.49] addr=1524 Maple Drive, Denver, CO 80203 date=2025-01-03 total=274.93 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00003\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 34.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 42.49}], \"total_amount\": 274.93, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-01-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00004 for Harper Lee includes 4 x noise-cancelling headphones @ $42.49, 1 x smart water bottle @ $49.99. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-01-04. Total charged: $219.95. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00004\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 219.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-01-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00005). got 1 x smart water bottle @ $49.99, 2 x gaming monitor @ $57.49; send it to UNKNOWN. total came out to $164.97 on 2025-01-05 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00005\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 49.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 57.49}], \"total_amount\": 164.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-01-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00006 name=Sofia Patel items:[2 x gaming monitor @ $57.49, 3 x laptop stand @ $64.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-01-06 total=314.20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00006\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 57.49}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 314.2, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00007 for Noah Nguyen includes 3 x laptop stand @ $64.99, 4 x desk lamp @ $72.49, 3 x laptop stand @ $64.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-01-07. Total charged: $679.90.",
+    "output": "{\"order_id\": \"GLD-00007\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 64.99}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 679.9, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% hey, it's Emma Rodriguez (GLD-00008). got 4 x desk lamp @ $72.49, 1 x portable SSD @ $79.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $369.95 on 2025-01-08 #@$%",
+    "output": "{\"order_id\": \"GLD-00008\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 369.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-01-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00009 name=Avery Johnson items:[1 x portable SSD @ $79.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-01-09 total=79.99",
+    "output": "{\"order_id\": \"GLD-00009\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 79.99, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-01-09\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00010 for Priya Shah includes 2 x webcam @ $19.99, 3 x wireless mouse @ $27.49. Ship to 19 Elm Court, Boston, MA 02108 on 2025-01-10. Total charged: $122.45.",
+    "output": "{\"order_id\": \"GLD-00010\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 19.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 122.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-01-10\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00011). got 3 x wireless mouse @ $27.49, 4 x mechanical keyboard @ $34.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $222.43 on 2025-01-11 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00011\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 27.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 34.99}], \"total_amount\": 222.43, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-11\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00012 name=Harper Lee items:[4 x mechanical keyboard @ $34.99, 1 x usb-c hub @ $42.49] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-01-12 total=182.45 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00012\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 182.45, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-12\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00013 for Jordan Kim includes 1 x usb-c hub @ $42.49, 2 x noise-cancelling headphones @ $49.99. Ship to UNKNOWN on 2025-01-13. Total charged: $142.47. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00013\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 42.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 49.99}], \"total_amount\": 142.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-01-13\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00014). got 2 x noise-cancelling headphones @ $49.99, 3 x smart water bottle @ $57.49; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $276.70 on 2025-01-14 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00014\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 49.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 276.7, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-01-14\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00015 name=Noah Nguyen items:[3 x smart water bottle @ $57.49, 4 x gaming monitor @ $64.99, 3 x smart water bottle @ $57.49] addr=19 Elm Court, Boston, MA 02108 date=2025-01-15 total=604.90",
+    "output": "{\"order_id\": \"GLD-00015\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 57.49}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 604.9, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-01-15\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] Order GLD-00016 for Emma Rodriguez includes 4 x gaming monitor @ $64.99, 1 x laptop stand @ $72.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-01-16. Total charged: $332.45. [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00016\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 332.45, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-16\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00017). got 1 x laptop stand @ $72.49; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $72.49 on 2025-01-17",
+    "output": "{\"order_id\": \"GLD-00017\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 72.49, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-17\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00018 name=Priya Shah items:[2 x desk lamp @ $79.99, 3 x portable SSD @ $19.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-01-18 total=219.95",
+    "output": "{\"order_id\": \"GLD-00018\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 79.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 219.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-01-18\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00019 for Miguel Torres includes 3 x portable SSD @ $19.99, 4 x webcam @ $27.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-01-19. Total charged: $169.93. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00019\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 19.99}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 27.49}], \"total_amount\": 169.93, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-01-19\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00020). got 4 x webcam @ $27.49, 1 x wireless mouse @ $34.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $144.95 on 2025-01-20 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00020\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 144.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-01-20\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00021 name=Jordan Kim items:[1 x wireless mouse @ $34.99, 2 x mechanical keyboard @ $42.49] addr=UNKNOWN date=2025-01-21 total=119.97 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00021\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 34.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 42.49}], \"total_amount\": 119.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-01-21\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00022 for Sofia Patel includes 2 x mechanical keyboard @ $42.49, 3 x usb-c hub @ $49.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-01-22. Total charged: $239.20. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00022\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 42.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 239.2, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-22\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00023). got 3 x usb-c hub @ $49.99, 4 x noise-cancelling headphones @ $57.49, 3 x usb-c hub @ $49.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $529.90 on 2025-01-23",
+    "output": "{\"order_id\": \"GLD-00023\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 49.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 529.9, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-01-23\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] id=GLD-00024 name=Emma Rodriguez items:[4 x noise-cancelling headphones @ $57.49, 1 x smart water bottle @ $64.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-01-24 total=294.95 [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00024\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 294.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-01-24\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00025 for Avery Johnson includes 1 x smart water bottle @ $64.99. Ship to 19 Elm Court, Boston, MA 02108 on 2025-01-25. Total charged: $64.99.",
+    "output": "{\"order_id\": \"GLD-00025\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 64.99, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-01-25\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00026). got 2 x gaming monitor @ $72.49, 3 x laptop stand @ $79.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $384.95 on 2025-01-26",
+    "output": "{\"order_id\": \"GLD-00026\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 72.49}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 384.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-26\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00027 name=Miguel Torres items:[3 x laptop stand @ $79.99, 4 x desk lamp @ $19.99] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-01-27 total=319.93 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00027\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 79.99}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 19.99}], \"total_amount\": 319.93, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-01-27\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00028 for Harper Lee includes 4 x desk lamp @ $19.99, 1 x portable SSD @ $27.49. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-01-28. Total charged: $107.45. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00028\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 107.45, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-01-28\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00029). got 1 x portable SSD @ $27.49, 2 x webcam @ $34.99; send it to UNKNOWN. total came out to $97.47 on 2025-01-29 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00029\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 27.49}, {\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 34.99}], \"total_amount\": 97.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-01-29\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00030 name=Sofia Patel items:[2 x webcam @ $34.99, 3 x wireless mouse @ $42.49] addr=19 Elm Court, Boston, MA 02108 date=2025-01-30 total=201.70 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00030\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 34.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 201.7, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-01-30\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00031 for Noah Nguyen includes 3 x wireless mouse @ $42.49, 4 x mechanical keyboard @ $49.99, 3 x wireless mouse @ $42.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-01-31. Total charged: $454.90.",
+    "output": "{\"order_id\": \"GLD-00031\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 42.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 454.9, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-01-31\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% hey, it's Emma Rodriguez (GLD-00032). got 4 x mechanical keyboard @ $49.99, 1 x usb-c hub @ $57.49; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $257.45 on 2025-02-01 #@$%",
+    "output": "{\"order_id\": \"GLD-00032\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 257.45, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-02-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00033 name=Avery Johnson items:[1 x usb-c hub @ $57.49] addr=1524 Maple Drive, Denver, CO 80203 date=2025-02-02 total=57.49",
+    "output": "{\"order_id\": \"GLD-00033\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 57.49, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-02-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00034 for Priya Shah includes 2 x noise-cancelling headphones @ $64.99, 3 x smart water bottle @ $72.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-02-03. Total charged: $347.45.",
+    "output": "{\"order_id\": \"GLD-00034\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 64.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 347.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00035). got 3 x smart water bottle @ $72.49, 4 x gaming monitor @ $79.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $537.43 on 2025-02-04 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00035\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 72.49}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 79.99}], \"total_amount\": 537.43, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-02-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00036 name=Harper Lee items:[4 x gaming monitor @ $79.99, 1 x laptop stand @ $19.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-02-05 total=339.95 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00036\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 339.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-02-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00037 for Jordan Kim includes 1 x laptop stand @ $19.99, 2 x desk lamp @ $27.49. Ship to UNKNOWN on 2025-02-06. Total charged: $74.97. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00037\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 19.99}, {\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 27.49}], \"total_amount\": 74.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-02-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00038). got 2 x desk lamp @ $27.49, 3 x portable SSD @ $34.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $164.20 on 2025-02-07 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00038\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 27.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 164.2, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-02-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00039 name=Noah Nguyen items:[3 x portable SSD @ $34.99, 4 x webcam @ $42.49, 3 x portable SSD @ $34.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-02-08 total=379.90",
+    "output": "{\"order_id\": \"GLD-00039\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 34.99}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 379.9, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] Order GLD-00040 for Emma Rodriguez includes 4 x webcam @ $42.49, 1 x wireless mouse @ $49.99. Ship to 19 Elm Court, Boston, MA 02108 on 2025-02-09. Total charged: $219.95. [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00040\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 219.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-02-09\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00041). got 1 x wireless mouse @ $49.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $49.99 on 2025-02-10",
+    "output": "{\"order_id\": \"GLD-00041\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 49.99, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-02-10\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00042 name=Priya Shah items:[2 x mechanical keyboard @ $57.49, 3 x usb-c hub @ $64.99] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-02-11 total=309.95",
+    "output": "{\"order_id\": \"GLD-00042\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 57.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 309.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-02-11\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00043 for Miguel Torres includes 3 x usb-c hub @ $64.99, 4 x noise-cancelling headphones @ $72.49. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-02-12. Total charged: $484.93. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00043\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 64.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 72.49}], \"total_amount\": 484.93, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-02-12\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00044). got 4 x noise-cancelling headphones @ $72.49, 1 x smart water bottle @ $79.99; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $369.95 on 2025-02-13 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00044\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 369.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-13\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00045 name=Jordan Kim items:[1 x smart water bottle @ $79.99, 2 x gaming monitor @ $19.99] addr=UNKNOWN date=2025-02-14 total=119.97 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00045\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 79.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 19.99}], \"total_amount\": 119.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-02-14\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00046 for Sofia Patel includes 2 x gaming monitor @ $19.99, 3 x laptop stand @ $27.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-02-15. Total charged: $126.70. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00046\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 19.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 126.7, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-02-15\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00047). got 3 x laptop stand @ $27.49, 4 x desk lamp @ $34.99, 3 x laptop stand @ $27.49; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $304.90 on 2025-02-16",
+    "output": "{\"order_id\": \"GLD-00047\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 27.49}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 304.9, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-02-16\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "<html>n/a</html> id=GLD-00048 name=Emma Rodriguez items:[4 x desk lamp @ $34.99, 1 x portable SSD @ $42.49] addr=1524 Maple Drive, Denver, CO 80203 date=2025-02-17 total=182.45 <html>n/a</html>",
+    "output": "{\"order_id\": \"GLD-00048\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 182.45, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-02-17\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00049 for Avery Johnson includes 1 x portable SSD @ $42.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-02-18. Total charged: $42.49.",
+    "output": "{\"order_id\": \"GLD-00049\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 42.49, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-18\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00050). got 2 x webcam @ $49.99, 3 x wireless mouse @ $57.49; send it to 19 Elm Court, Boston, MA 02108. total came out to $272.45 on 2025-02-19",
+    "output": "{\"order_id\": \"GLD-00050\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 49.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 272.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-02-19\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00051 name=Miguel Torres items:[3 x wireless mouse @ $57.49, 4 x mechanical keyboard @ $64.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-02-20 total=432.43 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00051\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 57.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 64.99}], \"total_amount\": 432.43, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-02-20\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00052 for Harper Lee includes 4 x mechanical keyboard @ $64.99, 1 x usb-c hub @ $72.49. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-02-21. Total charged: $332.45. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00052\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 332.45, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-02-21\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00053). got 1 x usb-c hub @ $72.49, 2 x noise-cancelling headphones @ $79.99; send it to UNKNOWN. total came out to $232.47 on 2025-02-22 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00053\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 72.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 79.99}], \"total_amount\": 232.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-02-22\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00054 name=Sofia Patel items:[2 x noise-cancelling headphones @ $79.99, 3 x smart water bottle @ $19.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-02-23 total=224.20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00054\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 79.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 224.2, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-23\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00055 for Noah Nguyen includes 3 x smart water bottle @ $19.99, 4 x gaming monitor @ $27.49, 3 x smart water bottle @ $19.99. Ship to 19 Elm Court, Boston, MA 02108 on 2025-02-24. Total charged: $229.90.",
+    "output": "{\"order_id\": \"GLD-00055\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 19.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 229.9, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-02-24\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] hey, it's Emma Rodriguez (GLD-00056). got 4 x gaming monitor @ $27.49, 1 x laptop stand @ $34.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $144.95 on 2025-02-25 [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00056\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 144.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-02-25\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00057 name=Avery Johnson items:[1 x laptop stand @ $34.99] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-02-26 total=34.99",
+    "output": "{\"order_id\": \"GLD-00057\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 34.99, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-02-26\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00058 for Priya Shah includes 2 x desk lamp @ $42.49, 3 x portable SSD @ $49.99. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-02-27. Total charged: $234.95.",
+    "output": "{\"order_id\": \"GLD-00058\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 42.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 234.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-02-27\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00059). got 3 x portable SSD @ $49.99, 4 x webcam @ $57.49; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $379.93 on 2025-02-28 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00059\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 49.99}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 57.49}], \"total_amount\": 379.93, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-02-28\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00060 name=Harper Lee items:[4 x webcam @ $57.49, 1 x wireless mouse @ $64.99] addr=19 Elm Court, Boston, MA 02108 date=2025-03-01 total=294.95 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00060\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 294.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00061 for Jordan Kim includes 1 x wireless mouse @ $64.99, 2 x mechanical keyboard @ $72.49. Ship to UNKNOWN on 2025-03-02. Total charged: $209.97. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00061\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 64.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 72.49}], \"total_amount\": 209.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-03-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00062). got 2 x mechanical keyboard @ $72.49, 3 x usb-c hub @ $79.99; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $389.20 on 2025-03-03 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00062\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 72.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 389.2, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-03-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00063 name=Noah Nguyen items:[3 x usb-c hub @ $79.99, 4 x noise-cancelling headphones @ $19.99, 3 x usb-c hub @ $79.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-03-04 total=559.90",
+    "output": "{\"order_id\": \"GLD-00063\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 79.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 559.9, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] Order GLD-00064 for Emma Rodriguez includes 4 x noise-cancelling headphones @ $19.99, 1 x smart water bottle @ $27.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-03-05. Total charged: $107.45. [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00064\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 107.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-03-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00065). got 1 x smart water bottle @ $27.49; send it to 19 Elm Court, Boston, MA 02108. total came out to $27.49 on 2025-03-06",
+    "output": "{\"order_id\": \"GLD-00065\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 27.49, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00066 name=Priya Shah items:[2 x gaming monitor @ $34.99, 3 x laptop stand @ $42.49] addr=421 Pine Street, Seattle, WA 98101 date=2025-03-07 total=197.45",
+    "output": "{\"order_id\": \"GLD-00066\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 34.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 197.45, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-03-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00067 for Miguel Torres includes 3 x laptop stand @ $42.49, 4 x desk lamp @ $49.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-03-08. Total charged: $327.43. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00067\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 42.49}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 49.99}], \"total_amount\": 327.43, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-03-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00068). got 4 x desk lamp @ $49.99, 1 x portable SSD @ $57.49; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $257.45 on 2025-03-09 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00068\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 257.45, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-09\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00069 name=Jordan Kim items:[1 x portable SSD @ $57.49, 2 x webcam @ $64.99] addr=UNKNOWN date=2025-03-10 total=187.47 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00069\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 57.49}, {\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 64.99}], \"total_amount\": 187.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-03-10\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00070 for Sofia Patel includes 2 x webcam @ $64.99, 3 x wireless mouse @ $72.49. Ship to 19 Elm Court, Boston, MA 02108 on 2025-03-11. Total charged: $351.70. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00070\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 64.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 351.7, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-11\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00071). got 3 x wireless mouse @ $72.49, 4 x mechanical keyboard @ $79.99, 3 x wireless mouse @ $72.49; send it to 421 Pine Street, Seattle, WA 98101. total came out to $754.90 on 2025-03-12",
+    "output": "{\"order_id\": \"GLD-00071\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 72.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 754.9, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-03-12\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] id=GLD-00072 name=Emma Rodriguez items:[4 x mechanical keyboard @ $79.99, 1 x usb-c hub @ $19.99] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-03-13 total=339.95 [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00072\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 339.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-03-13\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00073 for Avery Johnson includes 1 x usb-c hub @ $19.99. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-03-14. Total charged: $19.99.",
+    "output": "{\"order_id\": \"GLD-00073\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 19.99, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-14\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00074). got 2 x noise-cancelling headphones @ $27.49, 3 x smart water bottle @ $34.99; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $159.95 on 2025-03-15",
+    "output": "{\"order_id\": \"GLD-00074\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 27.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 159.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-03-15\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00075 name=Miguel Torres items:[3 x smart water bottle @ $34.99, 4 x gaming monitor @ $42.49] addr=19 Elm Court, Boston, MA 02108 date=2025-03-16 total=274.93 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00075\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 34.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 42.49}], \"total_amount\": 274.93, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-16\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00076 for Harper Lee includes 4 x gaming monitor @ $42.49, 1 x laptop stand @ $49.99. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-03-17. Total charged: $219.95. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00076\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 219.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-03-17\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00077). got 1 x laptop stand @ $49.99, 2 x desk lamp @ $57.49; send it to UNKNOWN. total came out to $164.97 on 2025-03-18 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00077\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 49.99}, {\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 57.49}], \"total_amount\": 164.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-03-18\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00078 name=Sofia Patel items:[2 x desk lamp @ $57.49, 3 x portable SSD @ $64.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-03-19 total=314.20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00078\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 57.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 314.2, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-19\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00079 for Noah Nguyen includes 3 x portable SSD @ $64.99, 4 x webcam @ $72.49, 3 x portable SSD @ $64.99. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-03-20. Total charged: $679.90.",
+    "output": "{\"order_id\": \"GLD-00079\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 64.99}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 679.9, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-03-20\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "<html>n/a</html> hey, it's Emma Rodriguez (GLD-00080). got 4 x webcam @ $72.49, 1 x wireless mouse @ $79.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $369.95 on 2025-03-21 <html>n/a</html>",
+    "output": "{\"order_id\": \"GLD-00080\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 369.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-21\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00081 name=Avery Johnson items:[1 x wireless mouse @ $79.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-03-22 total=79.99",
+    "output": "{\"order_id\": \"GLD-00081\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 79.99, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-03-22\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00082 for Priya Shah includes 2 x mechanical keyboard @ $19.99, 3 x usb-c hub @ $27.49. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-03-23. Total charged: $122.45.",
+    "output": "{\"order_id\": \"GLD-00082\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 19.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 122.45, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-03-23\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00083). got 3 x usb-c hub @ $27.49, 4 x noise-cancelling headphones @ $34.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $222.43 on 2025-03-24 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00083\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 27.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 34.99}], \"total_amount\": 222.43, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-24\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00084 name=Harper Lee items:[4 x noise-cancelling headphones @ $34.99, 1 x smart water bottle @ $42.49] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-03-25 total=182.45 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00084\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 182.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-03-25\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00085 for Jordan Kim includes 1 x smart water bottle @ $42.49, 2 x gaming monitor @ $49.99. Ship to UNKNOWN on 2025-03-26. Total charged: $142.47. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00085\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 42.49}, {\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 49.99}], \"total_amount\": 142.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-03-26\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00086). got 2 x gaming monitor @ $49.99, 3 x laptop stand @ $57.49; send it to 421 Pine Street, Seattle, WA 98101. total came out to $276.70 on 2025-03-27 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00086\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 49.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 276.7, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-03-27\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00087 name=Noah Nguyen items:[3 x laptop stand @ $57.49, 4 x desk lamp @ $64.99, 3 x laptop stand @ $57.49] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-03-28 total=604.90",
+    "output": "{\"order_id\": \"GLD-00087\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 57.49}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 604.9, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-03-28\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% Order GLD-00088 for Emma Rodriguez includes 4 x desk lamp @ $64.99, 1 x portable SSD @ $72.49. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-03-29. Total charged: $332.45. #@$%",
+    "output": "{\"order_id\": \"GLD-00088\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 332.45, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-03-29\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00089). got 1 x portable SSD @ $72.49; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $72.49 on 2025-03-30",
+    "output": "{\"order_id\": \"GLD-00089\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 72.49, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-03-30\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00090 name=Priya Shah items:[2 x webcam @ $79.99, 3 x wireless mouse @ $19.99] addr=19 Elm Court, Boston, MA 02108 date=2025-03-31 total=219.95",
+    "output": "{\"order_id\": \"GLD-00090\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 79.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 219.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-03-31\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00091 for Miguel Torres includes 3 x wireless mouse @ $19.99, 4 x mechanical keyboard @ $27.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-04-01. Total charged: $169.93. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00091\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 19.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 27.49}], \"total_amount\": 169.93, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-04-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00092). got 4 x mechanical keyboard @ $27.49, 1 x usb-c hub @ $34.99; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $144.95 on 2025-04-02 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00092\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 144.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-04-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00093 name=Jordan Kim items:[1 x usb-c hub @ $34.99, 2 x noise-cancelling headphones @ $42.49] addr=UNKNOWN date=2025-04-03 total=119.97 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00093\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 34.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 42.49}], \"total_amount\": 119.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-04-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00094 for Sofia Patel includes 2 x noise-cancelling headphones @ $42.49, 3 x smart water bottle @ $49.99. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-04-04. Total charged: $239.20. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00094\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 42.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 239.2, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-04-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00095). got 3 x smart water bottle @ $49.99, 4 x gaming monitor @ $57.49, 3 x smart water bottle @ $49.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $529.90 on 2025-04-05",
+    "output": "{\"order_id\": \"GLD-00095\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 49.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 529.9, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% id=GLD-00096 name=Emma Rodriguez items:[4 x gaming monitor @ $57.49, 1 x laptop stand @ $64.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-04-06 total=294.95 #@$%",
+    "output": "{\"order_id\": \"GLD-00096\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 294.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-04-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00097 for Avery Johnson includes 1 x laptop stand @ $64.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-04-07. Total charged: $64.99.",
+    "output": "{\"order_id\": \"GLD-00097\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 64.99, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-04-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00098). got 2 x desk lamp @ $72.49, 3 x portable SSD @ $79.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $384.95 on 2025-04-08",
+    "output": "{\"order_id\": \"GLD-00098\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 72.49}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 384.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-04-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00099 name=Miguel Torres items:[3 x portable SSD @ $79.99, 4 x webcam @ $19.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-04-09 total=319.93 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00099\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 79.99}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 19.99}], \"total_amount\": 319.93, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-04-09\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00100 for Harper Lee includes 4 x webcam @ $19.99, 1 x wireless mouse @ $27.49. Ship to 19 Elm Court, Boston, MA 02108 on 2025-04-10. Total charged: $107.45. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00100\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 107.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-10\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00101). got 1 x wireless mouse @ $27.49, 2 x mechanical keyboard @ $34.99; send it to UNKNOWN. total came out to $97.47 on 2025-04-11 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00101\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 27.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 34.99}], \"total_amount\": 97.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-04-11\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00102 name=Sofia Patel items:[2 x mechanical keyboard @ $34.99, 3 x usb-c hub @ $42.49] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-04-12 total=201.70 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00102\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 34.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 201.7, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-04-12\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00103 for Noah Nguyen includes 3 x usb-c hub @ $42.49, 4 x noise-cancelling headphones @ $49.99, 3 x usb-c hub @ $42.49. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-04-13. Total charged: $454.90.",
+    "output": "{\"order_id\": \"GLD-00103\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 42.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 454.9, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-04-13\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% hey, it's Emma Rodriguez (GLD-00104). got 4 x noise-cancelling headphones @ $49.99, 1 x smart water bottle @ $57.49; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $257.45 on 2025-04-14 #@$%",
+    "output": "{\"order_id\": \"GLD-00104\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 257.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-04-14\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00105 name=Avery Johnson items:[1 x smart water bottle @ $57.49] addr=19 Elm Court, Boston, MA 02108 date=2025-04-15 total=57.49",
+    "output": "{\"order_id\": \"GLD-00105\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 57.49, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-15\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00106 for Priya Shah includes 2 x gaming monitor @ $64.99, 3 x laptop stand @ $72.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-04-16. Total charged: $347.45.",
+    "output": "{\"order_id\": \"GLD-00106\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 64.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 347.45, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-04-16\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00107). got 3 x laptop stand @ $72.49, 4 x desk lamp @ $79.99; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $537.43 on 2025-04-17 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00107\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 72.49}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 79.99}], \"total_amount\": 537.43, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-04-17\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00108 name=Harper Lee items:[4 x desk lamp @ $79.99, 1 x portable SSD @ $19.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-04-18 total=339.95 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00108\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 339.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-04-18\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00109 for Jordan Kim includes 1 x portable SSD @ $19.99, 2 x webcam @ $27.49. Ship to UNKNOWN on 2025-04-19. Total charged: $74.97. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00109\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 19.99}, {\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 27.49}], \"total_amount\": 74.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-04-19\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00110). got 2 x webcam @ $27.49, 3 x wireless mouse @ $34.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $164.20 on 2025-04-20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00110\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 27.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 164.2, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-20\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00111 name=Noah Nguyen items:[3 x wireless mouse @ $34.99, 4 x mechanical keyboard @ $42.49, 3 x wireless mouse @ $34.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-04-21 total=379.90",
+    "output": "{\"order_id\": \"GLD-00111\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 34.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 379.9, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-04-21\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% Order GLD-00112 for Emma Rodriguez includes 4 x mechanical keyboard @ $42.49, 1 x usb-c hub @ $49.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-04-22. Total charged: $219.95. #@$%",
+    "output": "{\"order_id\": \"GLD-00112\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 219.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-04-22\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00113). got 1 x usb-c hub @ $49.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $49.99 on 2025-04-23",
+    "output": "{\"order_id\": \"GLD-00113\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 49.99, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-04-23\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00114 name=Priya Shah items:[2 x noise-cancelling headphones @ $57.49, 3 x smart water bottle @ $64.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-04-24 total=309.95",
+    "output": "{\"order_id\": \"GLD-00114\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 57.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 309.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-04-24\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00115 for Miguel Torres includes 3 x smart water bottle @ $64.99, 4 x gaming monitor @ $72.49. Ship to 19 Elm Court, Boston, MA 02108 on 2025-04-25. Total charged: $484.93. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00115\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 64.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 72.49}], \"total_amount\": 484.93, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-25\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00116). got 4 x gaming monitor @ $72.49, 1 x laptop stand @ $79.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $369.95 on 2025-04-26 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00116\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 369.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-04-26\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00117 name=Jordan Kim items:[1 x laptop stand @ $79.99, 2 x desk lamp @ $19.99] addr=UNKNOWN date=2025-04-27 total=119.97 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00117\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 79.99}, {\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 19.99}], \"total_amount\": 119.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-04-27\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00118 for Sofia Patel includes 2 x desk lamp @ $19.99, 3 x portable SSD @ $27.49. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-04-28. Total charged: $126.70. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00118\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 19.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 126.7, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-04-28\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00119). got 3 x portable SSD @ $27.49, 4 x webcam @ $34.99, 3 x portable SSD @ $27.49; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $304.90 on 2025-04-29",
+    "output": "{\"order_id\": \"GLD-00119\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 27.49}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 304.9, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-04-29\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "<html>n/a</html> id=GLD-00120 name=Emma Rodriguez items:[4 x webcam @ $34.99, 1 x wireless mouse @ $42.49] addr=19 Elm Court, Boston, MA 02108 date=2025-04-30 total=182.45 <html>n/a</html>",
+    "output": "{\"order_id\": \"GLD-00120\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 182.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-04-30\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00121 for Avery Johnson includes 1 x wireless mouse @ $42.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-05-01. Total charged: $42.49.",
+    "output": "{\"order_id\": \"GLD-00121\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 42.49, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00122). got 2 x mechanical keyboard @ $49.99, 3 x usb-c hub @ $57.49; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $272.45 on 2025-05-02",
+    "output": "{\"order_id\": \"GLD-00122\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 49.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 272.45, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00123 name=Miguel Torres items:[3 x usb-c hub @ $57.49, 4 x noise-cancelling headphones @ $64.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-05-03 total=432.43 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00123\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 57.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 64.99}], \"total_amount\": 432.43, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-05-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00124 for Harper Lee includes 4 x noise-cancelling headphones @ $64.99, 1 x smart water bottle @ $72.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-05-04. Total charged: $332.45. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00124\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 332.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-05-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00125). got 1 x smart water bottle @ $72.49, 2 x gaming monitor @ $79.99; send it to UNKNOWN. total came out to $232.47 on 2025-05-05 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00125\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 72.49}, {\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 79.99}], \"total_amount\": 232.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-05-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00126 name=Sofia Patel items:[2 x gaming monitor @ $79.99, 3 x laptop stand @ $19.99] addr=421 Pine Street, Seattle, WA 98101 date=2025-05-06 total=224.20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00126\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 79.99}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 224.2, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00127 for Noah Nguyen includes 3 x laptop stand @ $19.99, 4 x desk lamp @ $27.49, 3 x laptop stand @ $19.99. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-05-07. Total charged: $229.90.",
+    "output": "{\"order_id\": \"GLD-00127\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 19.99}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 19.99}], \"total_amount\": 229.9, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "<html>n/a</html> hey, it's Emma Rodriguez (GLD-00128). got 4 x desk lamp @ $27.49, 1 x portable SSD @ $34.99; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $144.95 on 2025-05-08 <html>n/a</html>",
+    "output": "{\"order_id\": \"GLD-00128\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 27.49}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 144.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-05-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00129 name=Avery Johnson items:[1 x portable SSD @ $34.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-05-09 total=34.99",
+    "output": "{\"order_id\": \"GLD-00129\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 34.99}], \"total_amount\": 34.99, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-05-09\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00130 for Priya Shah includes 2 x webcam @ $42.49, 3 x wireless mouse @ $49.99. Ship to 19 Elm Court, Boston, MA 02108 on 2025-05-10. Total charged: $234.95.",
+    "output": "{\"order_id\": \"GLD-00130\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 42.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 49.99}], \"total_amount\": 234.95, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-05-10\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00131). got 3 x wireless mouse @ $49.99, 4 x mechanical keyboard @ $57.49; send it to 421 Pine Street, Seattle, WA 98101. total came out to $379.93 on 2025-05-11 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00131\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 49.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 57.49}], \"total_amount\": 379.93, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-11\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00132 name=Harper Lee items:[4 x mechanical keyboard @ $57.49, 1 x usb-c hub @ $64.99] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-05-12 total=294.95 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00132\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 57.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 64.99}], \"total_amount\": 294.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-12\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00133 for Jordan Kim includes 1 x usb-c hub @ $64.99, 2 x noise-cancelling headphones @ $72.49. Ship to UNKNOWN on 2025-05-13. Total charged: $209.97. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00133\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 64.99}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 72.49}], \"total_amount\": 209.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-05-13\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00134). got 2 x noise-cancelling headphones @ $72.49, 3 x smart water bottle @ $79.99; send it to 740 Mission Blvd, San Diego, CA 92109. total came out to $389.20 on 2025-05-14 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00134\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 72.49}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 389.2, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-05-14\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00135 name=Noah Nguyen items:[3 x smart water bottle @ $79.99, 4 x gaming monitor @ $19.99, 3 x smart water bottle @ $79.99] addr=19 Elm Court, Boston, MA 02108 date=2025-05-15 total=559.90",
+    "output": "{\"order_id\": \"GLD-00135\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 79.99}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 79.99}], \"total_amount\": 559.9, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-05-15\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] Order GLD-00136 for Emma Rodriguez includes 4 x gaming monitor @ $19.99, 1 x laptop stand @ $27.49. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-05-16. Total charged: $107.45. [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00136\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 19.99}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 107.45, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-16\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Avery Johnson (GLD-00137). got 1 x laptop stand @ $27.49; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $27.49 on 2025-05-17",
+    "output": "{\"order_id\": \"GLD-00137\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 27.49}], \"total_amount\": 27.49, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-17\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00138 name=Priya Shah items:[2 x desk lamp @ $34.99, 3 x portable SSD @ $42.49] addr=1524 Maple Drive, Denver, CO 80203 date=2025-05-18 total=197.45",
+    "output": "{\"order_id\": \"GLD-00138\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 34.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 42.49}], \"total_amount\": 197.45, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-05-18\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00139 for Miguel Torres includes 3 x portable SSD @ $42.49, 4 x webcam @ $49.99. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-05-19. Total charged: $327.43. Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00139\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 42.49}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 49.99}], \"total_amount\": 327.43, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-05-19\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** hey, it's Harper Lee (GLD-00140). got 4 x webcam @ $49.99, 1 x wireless mouse @ $57.49; send it to 19 Elm Court, Boston, MA 02108. total came out to $257.45 on 2025-05-20 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00140\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 49.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 57.49}], \"total_amount\": 257.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-05-20\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00141 name=Jordan Kim items:[1 x wireless mouse @ $57.49, 2 x mechanical keyboard @ $64.99] addr=UNKNOWN date=2025-05-21 total=187.47 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00141\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 57.49}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 64.99}], \"total_amount\": 187.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-05-21\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00142 for Sofia Patel includes 2 x mechanical keyboard @ $64.99, 3 x usb-c hub @ $72.49. Ship to 88 Lakeview Ave, Austin, TX 73301 on 2025-05-22. Total charged: $351.70. Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00142\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 2, \"price\": 64.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 351.7, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-22\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Noah Nguyen (GLD-00143). got 3 x usb-c hub @ $72.49, 4 x noise-cancelling headphones @ $79.99, 3 x usb-c hub @ $72.49; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $754.90 on 2025-05-23",
+    "output": "{\"order_id\": \"GLD-00143\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 72.49}, {\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"usb-c hub\", \"quantity\": 3, \"price\": 72.49}], \"total_amount\": 754.9, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-05-23\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "#@$% id=GLD-00144 name=Emma Rodriguez items:[4 x noise-cancelling headphones @ $79.99, 1 x smart water bottle @ $19.99] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-05-24 total=339.95 #@$%",
+    "output": "{\"order_id\": \"GLD-00144\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 4, \"price\": 79.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 339.95, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-05-24\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00145 for Avery Johnson includes 1 x smart water bottle @ $19.99. Ship to 19 Elm Court, Boston, MA 02108 on 2025-05-25. Total charged: $19.99.",
+    "output": "{\"order_id\": \"GLD-00145\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 1, \"price\": 19.99}], \"total_amount\": 19.99, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-05-25\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Priya Shah (GLD-00146). got 2 x gaming monitor @ $27.49, 3 x laptop stand @ $34.99; send it to 421 Pine Street, Seattle, WA 98101. total came out to $159.95 on 2025-05-26",
+    "output": "{\"order_id\": \"GLD-00146\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 2, \"price\": 27.49}, {\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 34.99}], \"total_amount\": 159.95, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-26\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00147 name=Miguel Torres items:[3 x laptop stand @ $34.99, 4 x desk lamp @ $42.49] addr=88 Lakeview Ave, Austin, TX 73301 date=2025-05-27 total=274.93 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00147\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 3, \"price\": 34.99}, {\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 42.49}], \"total_amount\": 274.93, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-05-27\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** Order GLD-00148 for Harper Lee includes 4 x desk lamp @ $42.49, 1 x portable SSD @ $49.99. Ship to 1524 Maple Drive, Denver, CO 80203 on 2025-05-28. Total charged: $219.95. ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00148\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 4, \"price\": 42.49}, {\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 49.99}], \"total_amount\": 219.95, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-05-28\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Jordan Kim (GLD-00149). got 1 x portable SSD @ $49.99, 2 x webcam @ $57.49; send it to UNKNOWN. total came out to $164.97 on 2025-05-29 Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00149\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 1, \"price\": 49.99}, {\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 57.49}], \"total_amount\": 164.97, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-05-29\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00150 name=Sofia Patel items:[2 x webcam @ $57.49, 3 x wireless mouse @ $64.99] addr=19 Elm Court, Boston, MA 02108 date=2025-05-30 total=314.20 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00150\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 2, \"price\": 57.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 314.2, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-05-30\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00151 for Noah Nguyen includes 3 x wireless mouse @ $64.99, 4 x mechanical keyboard @ $72.49, 3 x wireless mouse @ $64.99. Ship to 421 Pine Street, Seattle, WA 98101 on 2025-05-31. Total charged: $679.90.",
+    "output": "{\"order_id\": \"GLD-00151\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 64.99}, {\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"wireless mouse\", \"quantity\": 3, \"price\": 64.99}], \"total_amount\": 679.9, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-05-31\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] hey, it's Emma Rodriguez (GLD-00152). got 4 x mechanical keyboard @ $72.49, 1 x usb-c hub @ $79.99; send it to 88 Lakeview Ave, Austin, TX 73301. total came out to $369.95 on 2025-06-01 [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00152\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"mechanical keyboard\", \"quantity\": 4, \"price\": 72.49}, {\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 369.95, \"shipping_address\": \"88 Lakeview Ave, Austin, TX 73301\", \"order_date\": \"2025-06-01\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00153 name=Avery Johnson items:[1 x usb-c hub @ $79.99] addr=1524 Maple Drive, Denver, CO 80203 date=2025-06-02 total=79.99",
+    "output": "{\"order_id\": \"GLD-00153\", \"customer_name\": \"Avery Johnson\", \"items\": [{\"product_name\": \"usb-c hub\", \"quantity\": 1, \"price\": 79.99}], \"total_amount\": 79.99, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-06-02\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00154 for Priya Shah includes 2 x noise-cancelling headphones @ $19.99, 3 x smart water bottle @ $27.49. Ship to 740 Mission Blvd, San Diego, CA 92109 on 2025-06-03. Total charged: $122.45.",
+    "output": "{\"order_id\": \"GLD-00154\", \"customer_name\": \"Priya Shah\", \"items\": [{\"product_name\": \"noise-cancelling headphones\", \"quantity\": 2, \"price\": 19.99}, {\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 27.49}], \"total_amount\": 122.45, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-06-03\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Miguel Torres (GLD-00155). got 3 x smart water bottle @ $27.49, 4 x gaming monitor @ $34.99; send it to 19 Elm Court, Boston, MA 02108. total came out to $222.43 on 2025-06-04 Note: maybe add gift wrap later, but current charge is what matters.",
+    "output": "{\"order_id\": \"GLD-00155\", \"customer_name\": \"Miguel Torres\", \"items\": [{\"product_name\": \"smart water bottle\", \"quantity\": 3, \"price\": 27.49}, {\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 34.99}], \"total_amount\": 222.43, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-06-04\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "***RAW*** id=GLD-00156 name=Harper Lee items:[4 x gaming monitor @ $34.99, 1 x laptop stand @ $42.49] addr=421 Pine Street, Seattle, WA 98101 date=2025-06-05 total=182.45 ::: copied from chat log!!!",
+    "output": "{\"order_id\": \"GLD-00156\", \"customer_name\": \"Harper Lee\", \"items\": [{\"product_name\": \"gaming monitor\", \"quantity\": 4, \"price\": 34.99}, {\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 42.49}], \"total_amount\": 182.45, \"shipping_address\": \"421 Pine Street, Seattle, WA 98101\", \"order_date\": \"2025-06-05\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "Order GLD-00157 for Jordan Kim includes 1 x laptop stand @ $42.49, 2 x desk lamp @ $49.99. Ship to UNKNOWN on 2025-06-06. Total charged: $142.47. Address line was not provided clearly in the source message.",
+    "output": "{\"order_id\": \"GLD-00157\", \"customer_name\": \"Jordan Kim\", \"items\": [{\"product_name\": \"laptop stand\", \"quantity\": 1, \"price\": 42.49}, {\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 49.99}], \"total_amount\": 142.47, \"shipping_address\": \"UNKNOWN\", \"order_date\": \"2025-06-06\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "hey, it's Sofia Patel (GLD-00158). got 2 x desk lamp @ $49.99, 3 x portable SSD @ $57.49; send it to 1524 Maple Drive, Denver, CO 80203. total came out to $276.70 on 2025-06-07 Customer notes subtotal math looked odd; keep stated final total.",
+    "output": "{\"order_id\": \"GLD-00158\", \"customer_name\": \"Sofia Patel\", \"items\": [{\"product_name\": \"desk lamp\", \"quantity\": 2, \"price\": 49.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 276.7, \"shipping_address\": \"1524 Maple Drive, Denver, CO 80203\", \"order_date\": \"2025-06-07\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "id=GLD-00159 name=Noah Nguyen items:[3 x portable SSD @ $57.49, 4 x webcam @ $64.99, 3 x portable SSD @ $57.49] addr=740 Mission Blvd, San Diego, CA 92109 date=2025-06-08 total=604.90",
+    "output": "{\"order_id\": \"GLD-00159\", \"customer_name\": \"Noah Nguyen\", \"items\": [{\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 57.49}, {\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"portable SSD\", \"quantity\": 3, \"price\": 57.49}], \"total_amount\": 604.9, \"shipping_address\": \"740 Mission Blvd, San Diego, CA 92109\", \"order_date\": \"2025-06-08\"}"
+  },
+  {
+    "instruction": "Extract the e-commerce order information from the text and return a strict JSON object that matches the required schema.",
+    "input": "[attachment missing] Order GLD-00160 for Emma Rodriguez includes 4 x webcam @ $64.99, 1 x wireless mouse @ $72.49. Ship to 19 Elm Court, Boston, MA 02108 on 2025-06-09. Total charged: $332.45. [attachment missing]",
+    "output": "{\"order_id\": \"GLD-00160\", \"customer_name\": \"Emma Rodriguez\", \"items\": [{\"product_name\": \"webcam\", \"quantity\": 4, \"price\": 64.99}, {\"product_name\": \"wireless mouse\", \"quantity\": 1, \"price\": 72.49}], \"total_amount\": 332.45, \"shipping_address\": \"19 Elm Court, Boston, MA 02108\", \"order_date\": \"2025-06-09\"}"
+  }
+]
