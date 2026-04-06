@@ -13,24 +13,53 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_mlflow(mlflow_module: Any, experiment_name: str, *, root_dir: Path, logger: logging.Logger | None = None) -> None:
     logger = logger or LOGGER
+    tracking_uri = None
+    artifact_root = None
+    configure_mlflow_paths(
+        mlflow_module,
+        experiment_name,
+        root_dir=root_dir,
+        logger=logger,
+        tracking_uri=tracking_uri,
+        artifact_root=artifact_root,
+    )
 
-    tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+
+def configure_mlflow_paths(
+    mlflow_module: Any,
+    experiment_name: str,
+    *,
+    root_dir: Path,
+    logger: logging.Logger | None = None,
+    tracking_uri: str | None = None,
+    artifact_root: str | Path | None = None,
+) -> None:
+    logger = logger or LOGGER
+
+    tracking_uri = tracking_uri or os.getenv("MLFLOW_TRACKING_URI")
     if not tracking_uri:
         tracking_uri = f"sqlite:///{(root_dir / 'mlflow.db').resolve()}"
         os.environ["MLFLOW_TRACKING_URI"] = tracking_uri
 
-    artifact_root = Path(
-        os.getenv("MLFLOW_ARTIFACT_ROOT", str((root_dir / "mlruns").resolve()))
-    ).expanduser().resolve()
-    artifact_root.mkdir(parents=True, exist_ok=True)
-    os.environ.setdefault("MLFLOW_ARTIFACT_ROOT", str(artifact_root))
+    artifact_root_value = artifact_root or os.getenv("MLFLOW_ARTIFACT_ROOT")
+    if artifact_root_value is None:
+        artifact_root_path = (root_dir / "mlruns").resolve()
+    else:
+        artifact_root_path = Path(artifact_root_value)
+        if not artifact_root_path.is_absolute():
+            artifact_root_path = (root_dir / artifact_root_path).resolve()
+        else:
+            artifact_root_path = artifact_root_path.expanduser().resolve()
+
+    artifact_root_path.mkdir(parents=True, exist_ok=True)
+    os.environ["MLFLOW_ARTIFACT_ROOT"] = str(artifact_root_path)
 
     mlflow_module.set_tracking_uri(tracking_uri)
     _ensure_local_experiment_artifact_root(
         mlflow_module,
         experiment_name=experiment_name,
         tracking_uri=tracking_uri,
-        artifact_root=artifact_root,
+        artifact_root=artifact_root_path,
         logger=logger,
     )
     mlflow_module.set_experiment(experiment_name)
