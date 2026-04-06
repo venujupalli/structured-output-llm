@@ -205,16 +205,13 @@ TRAINING_PRESET=quality bash scripts/run_training_local.sh
 
 ### Local model/adaptor defaults
 
-For local MacBook runs, `configs/model_config.local.yaml` now uses `model_name: auto` and `adapter_mode: auto`.
+For local runs, `configs/model_config.local.yaml` now pins `model_name: Qwen/Qwen2.5-0.5B-Instruct`.
 
-- On macOS, the project picks a Qwen2.5 Instruct model tier based on available system memory:
-  - up to 12 GB: `Qwen/Qwen2.5-0.5B-Instruct`
-  - 12 GB to 24 GB: `Qwen/Qwen2.5-1.5B-Instruct`
-  - above 24 GB: `Qwen/Qwen2.5-3B-Instruct`
-- On Apple Silicon / non-CUDA local setups, the project uses LoRA by default.
+- This keeps local training and evaluation on the smallest Qwen2.5 Instruct tier by default.
+- `adapter_mode: auto` is still used, so Apple Silicon / non-CUDA local setups use LoRA by default.
 - On CUDA setups with `bitsandbytes` available, `adapter_mode: auto` upgrades to QLoRA automatically.
 
-This avoids the unsupported 4-bit `bitsandbytes` path on most MacBook environments while still letting GPU environments use QLoRA.
+This keeps local runs lighter while still letting GPU environments use QLoRA when supported.
 
 ### Local UI
 

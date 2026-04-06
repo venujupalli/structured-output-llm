@@ -11,8 +11,10 @@ fi
 
 export HF_HOME="${HF_HOME:-$ROOT_DIR/.cache/huggingface}"
 export TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-$HF_HOME}"
+export MLFLOW_TRACKING_URI="${MLFLOW_TRACKING_URI:-sqlite:///$ROOT_DIR/mlflow.db}"
+export MLFLOW_ARTIFACT_ROOT="${MLFLOW_ARTIFACT_ROOT:-$ROOT_DIR/mlruns}"
 
-mkdir -p "$HF_HOME" "$ROOT_DIR/artifacts/local-evaluation"
+mkdir -p "$HF_HOME" "$ROOT_DIR/artifacts/local-evaluation" "$MLFLOW_ARTIFACT_ROOT"
 
 DEFAULT_MODEL_CONFIG="configs/model_config.local.yaml"
 DEFAULT_TRAINING_CONFIG="configs/training_config.local.yaml"
@@ -42,6 +44,8 @@ echo "[local-eval] Using schema config: ${SCHEMA_CONFIG_PATH:-$DEFAULT_SCHEMA_CO
 echo "[local-eval] Adapter path: ${ADAPTER_PATH:-$DEFAULT_ADAPTER_PATH}"
 echo "[local-eval] Report path: ${EVAL_REPORT_PATH:-$DEFAULT_REPORT_PATH}"
 echo "[local-eval] HF cache: ${TRANSFORMERS_CACHE}"
+echo "[local-eval] MLflow tracking URI: ${MLFLOW_TRACKING_URI}"
+echo "[local-eval] MLflow artifact root: ${MLFLOW_ARTIFACT_ROOT}"
 echo "[local-eval] Runtime: uv"
 
 "${CMD[@]}"

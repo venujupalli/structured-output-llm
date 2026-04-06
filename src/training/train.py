@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import inspect
 import logging
-import os
 import random
 from pathlib import Path
 
@@ -17,6 +16,7 @@ from trl import SFTTrainer
 from src.data.dataset import format_example, load_alpaca_dataset
 from src.utils.config import deep_merge, load_yaml
 from src.utils.logging_utils import setup_logging
+from src.utils.mlflow_utils import configure_mlflow, safe_log_artifacts
 from src.utils.runtime import log_accelerator_report, recommend_model_name, resolve_adapter_mode, resolve_device
 
 LOGGER = logging.getLogger(__name__)
@@ -158,10 +158,7 @@ def main() -> None:
     seed = int(training_cfg.get("seed", 42))
     set_seed(seed)
 
-    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
-    if mlflow_uri:
-        mlflow.set_tracking_uri(mlflow_uri)
-    mlflow.set_experiment(training_cfg["mlflow"]["experiment_name"])
+    configure_mlflow(mlflow, training_cfg["mlflow"]["experiment_name"], root_dir=ROOT_DIR, logger=LOGGER)
 
     with mlflow.start_run(run_name=training_cfg["mlflow"].get("run_name", "qwen-qlora-train")):
         mlflow.log_params(
@@ -256,7 +253,7 @@ def main() -> None:
         trainer.model.save_pretrained(str(output_dir / "adapter"))
         tokenizer.save_pretrained(str(output_dir / "adapter"))
 
-        mlflow.log_artifacts(str(output_dir / "adapter"), artifact_path="adapter")
+        safe_log_artifacts(mlflow, str(output_dir / "adapter"), artifact_path="adapter", logger=LOGGER)
         mlflow.log_metric("train_samples", len(train_dataset))
         LOGGER.info("Training completed and adapter saved.")
 

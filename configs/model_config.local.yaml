@@ -1,4 +1,4 @@
-model_name: auto
+model_name: Qwen/Qwen2.5-0.5B-Instruct
 default_model_name: Qwen/Qwen2.5-0.5B-Instruct
 cache_dir: ./.cache/huggingface
 adapter_mode: auto
