@@ -14,12 +14,15 @@ optimizer: adamw_torch
 lr_scheduler_type: cosine
 warmup_ratio: 0.03
 packing: false
-eval_max_new_tokens: 64
+eval_max_new_tokens: 192
+eval_batch_size: 4
 dataset:
   train_path: ./data/synthetic/train.jsonl
   train_max_records: 500
   eval_path: ./data/synthetic/val.jsonl
 mlflow:
+  tracking_uri: sqlite:///./mlflow.db
+  artifact_root: ./mlruns
   experiment_name: structured-output-llm-local
   run_name: macbook-local-adapter-train
   eval_run_name: macbook-local-adapter-eval

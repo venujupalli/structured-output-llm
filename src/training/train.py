@@ -16,10 +16,11 @@ from trl import SFTTrainer
 from src.data.dataset import format_example, load_alpaca_dataset
 from src.utils.config import deep_merge, load_yaml
 from src.utils.logging_utils import setup_logging
-from src.utils.mlflow_utils import configure_mlflow, safe_log_artifacts
+from src.utils.mlflow_utils import configure_mlflow_paths, safe_log_artifacts
 from src.utils.runtime import log_accelerator_report, recommend_model_name, resolve_adapter_mode, resolve_device
 
 LOGGER = logging.getLogger(__name__)
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def set_seed(seed: int) -> None:
@@ -158,7 +159,14 @@ def main() -> None:
     seed = int(training_cfg.get("seed", 42))
     set_seed(seed)
 
-    configure_mlflow(mlflow, training_cfg["mlflow"]["experiment_name"], root_dir=ROOT_DIR, logger=LOGGER)
+    configure_mlflow_paths(
+        mlflow,
+        training_cfg["mlflow"]["experiment_name"],
+        root_dir=ROOT_DIR,
+        logger=LOGGER,
+        tracking_uri=training_cfg["mlflow"].get("tracking_uri"),
+        artifact_root=training_cfg["mlflow"].get("artifact_root"),
+    )
 
     with mlflow.start_run(run_name=training_cfg["mlflow"].get("run_name", "qwen-qlora-train")):
         mlflow.log_params(

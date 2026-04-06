@@ -58,6 +58,34 @@ def save_state(state: dict[str, Any]) -> None:
 
 
 def _pid_is_running(pid: int) -> bool:
+    # If this process launched the child, reap it when it has already exited.
+    try:
+        waited_pid, _ = os.waitpid(pid, os.WNOHANG)
+        if waited_pid == pid:
+            return False
+    except ChildProcessError:
+        pass
+
+    # On macOS, kill(pid, 0) can still succeed for zombie processes.
+    try:
+        result = subprocess.run(
+            ["ps", "-o", "stat=", "-p", str(pid)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            return False
+
+        status = result.stdout.strip()
+        if not status:
+            return False
+        if "Z" in status:
+            return False
+        return True
+    except Exception:
+        pass
+
     try:
         os.kill(pid, 0)
     except OSError:
@@ -70,7 +98,21 @@ def refresh_jobs() -> dict[str, Any]:
     changed = False
     for job_name, job in state["jobs"].items():
         pid = job.get("pid")
-        if pid and job.get("status") == "running" and not _pid_is_running(pid):
+        if job.get("status") != "running":
+            continue
+
+        report_path = job.get("report_path")
+        if report_path:
+            report_file = Path(report_path)
+            if report_file.exists():
+                finished_at = report_file.stat().st_mtime
+                if finished_at >= job.get("started_at", 0):
+                    job["status"] = "finished"
+                    job["finished_at"] = finished_at
+                    changed = True
+                    continue
+
+        if pid and not _pid_is_running(pid):
             job["status"] = "finished"
             job["finished_at"] = time.time()
             changed = True
