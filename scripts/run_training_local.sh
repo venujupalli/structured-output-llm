@@ -11,8 +11,10 @@ fi
 
 export HF_HOME="${HF_HOME:-$ROOT_DIR/.cache/huggingface}"
 export TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-$HF_HOME}"
+export MLFLOW_TRACKING_URI="${MLFLOW_TRACKING_URI:-sqlite:///$ROOT_DIR/mlflow.db}"
+export MLFLOW_ARTIFACT_ROOT="${MLFLOW_ARTIFACT_ROOT:-$ROOT_DIR/mlruns}"
 
-mkdir -p "$HF_HOME" "$ROOT_DIR/artifacts/local-model"
+mkdir -p "$HF_HOME" "$ROOT_DIR/artifacts/local-model" "$MLFLOW_ARTIFACT_ROOT"
 
 TRAINING_PRESET="${TRAINING_PRESET:-balanced}"
 PRESET_CONFIG_PATH=""
@@ -61,6 +63,8 @@ elif [[ -n "$PRESET_CONFIG_PATH" ]]; then
   echo "[local-train] Preset override config: ${PRESET_CONFIG_PATH}"
 fi
 echo "[local-train] HF cache: ${TRANSFORMERS_CACHE}"
+echo "[local-train] MLflow tracking URI: ${MLFLOW_TRACKING_URI}"
+echo "[local-train] MLflow artifact root: ${MLFLOW_ARTIFACT_ROOT}"
 echo "[local-train] Runtime: uv"
 
 "${CMD[@]}"
