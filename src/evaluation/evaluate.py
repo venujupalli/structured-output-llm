@@ -31,7 +31,6 @@ from src.utils.runtime import (
 
 LOGGER = logging.getLogger(__name__)
 PROGRESS_LOG_INTERVAL = 25
-DEFAULT_EVAL_BATCH_SIZE = 4
 
 
 def parse_args() -> argparse.Namespace:
@@ -125,6 +124,34 @@ def evaluate_candidate(candidate: str, row: dict, schema: dict, required_fields:
     return result
 
 
+def decode_completion(tokenizer, completion_tokens: torch.Tensor, *, sample_index: int) -> str:
+    token_ids = completion_tokens.detach().to("cpu", dtype=torch.long).tolist()
+    if not isinstance(token_ids, list):
+        token_ids = list(token_ids)
+
+    vocab_size = len(tokenizer)
+    sanitized_ids: list[int] = []
+    dropped = 0
+    for token_id in token_ids:
+        token_id = int(token_id)
+        if token_id < 0:
+            dropped += 1
+            continue
+        if vocab_size is not None and token_id >= vocab_size:
+            dropped += 1
+            continue
+        sanitized_ids.append(token_id)
+
+    if dropped:
+        LOGGER.warning(
+            "Dropped %d invalid generated token ids for sample %d before decode.",
+            dropped,
+            sample_index,
+        )
+
+    return tokenizer.decode(sanitized_ids, skip_special_tokens=True).strip()
+
+
 def main() -> None:
     args = parse_args()
     setup_logging()
@@ -169,6 +196,7 @@ def main() -> None:
         LOGGER.info("Loaded adapter from %s", adapter_path)
     else:
         LOGGER.info("Adapter not found at %s; evaluating base model only.", adapter_path)
+    model.eval()
 
     eval_data_path = args.eval_data_path or train_cfg["dataset"]["eval_path"]
     eval_data = load_dataset("json", data_files=eval_data_path, split="train")
@@ -178,37 +206,45 @@ def main() -> None:
     metrics = EvalMetrics(total=len(eval_data))
     detailed = []
     started_at = time.time()
-    eval_batch_size = int(train_cfg.get("eval_batch_size", DEFAULT_EVAL_BATCH_SIZE))
     LOGGER.info(
-        "Starting evaluation over %d samples from %s with adapter=%s batch_size=%d",
+        "Starting evaluation over %d samples from %s with adapter=%s",
         metrics.total,
         eval_data_path,
         adapter_path if Path(adapter_path).exists() else "base-model-only",
-        eval_batch_size,
     )
+    model.generation_config.do_sample = False
+    model.generation_config.temperature = None
+    model.generation_config.top_p = None
+    model.generation_config.top_k = None
+    model.generation_config.num_beams = 1
+    generation_kwargs = {
+        "max_new_tokens": train_cfg.get("eval_max_new_tokens", 256),
+        "pad_token_id": tokenizer.pad_token_id,
+        "do_sample": False,
+        "num_beams": 1,
+    }
+    if model.generation_config.eos_token_id is not None:
+        generation_kwargs["eos_token_id"] = model.generation_config.eos_token_id
+    if getattr(model.generation_config, "repetition_penalty", None) is not None:
+        generation_kwargs["repetition_penalty"] = model.generation_config.repetition_penalty
     next_progress_log = PROGRESS_LOG_INTERVAL
 
-    for batch_start in range(0, metrics.total, eval_batch_size):
-        batch_end = min(batch_start + eval_batch_size, metrics.total)
-        batch_rows = [eval_data[idx] for idx in range(batch_start, batch_end)]
-        prompts = [build_prompt(row["instruction"], row.get("input", "")) for row in batch_rows]
+    for sample_index, row in enumerate(eval_data):
+        prompt = build_prompt(row["instruction"], row.get("input", ""))
         tokenized = tokenizer(
-            prompts,
+            prompt,
             return_tensors="pt",
-            padding=True,
             truncation=True,
             max_length=train_cfg.get("max_seq_length"),
         )
-        prompt_lengths = tokenized["attention_mask"].sum(dim=1).tolist()
+        input_length = int(tokenized["input_ids"].shape[-1])
         inputs = {name: value.to(model.device) for name, value in tokenized.items()}
-        generated = model.generate(**inputs, max_new_tokens=train_cfg.get("eval_max_new_tokens", 256))
+        generated = model.generate(**inputs, **generation_kwargs)
+        completion_tokens = generated[0][input_length:]
+        candidate = decode_completion(tokenizer, completion_tokens, sample_index=sample_index)
+        detailed.append(evaluate_candidate(candidate, row, schema, required_fields, metrics))
 
-        for row, sequence, prompt_length in zip(batch_rows, generated, prompt_lengths):
-            completion_tokens = sequence[int(prompt_length):]
-            candidate = tokenizer.decode(completion_tokens, skip_special_tokens=True).strip()
-            detailed.append(evaluate_candidate(candidate, row, schema, required_fields, metrics))
-
-        completed = batch_end
+        completed = sample_index + 1
         if completed >= next_progress_log or completed == metrics.total:
             log_eval_progress(metrics, completed=completed, total=metrics.total, started_at=started_at)
             while next_progress_log <= completed:

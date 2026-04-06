@@ -15,7 +15,6 @@ lr_scheduler_type: cosine
 warmup_ratio: 0.03
 packing: false
 eval_max_new_tokens: 192
-eval_batch_size: 4
 dataset:
   train_path: ./data/synthetic/train.jsonl
   train_max_records: 500
