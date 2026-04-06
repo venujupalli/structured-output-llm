@@ -105,57 +105,51 @@ def render_metrics(title: str, report_path: Path) -> None:
         st.code(json.dumps(report, indent=2)[:20000], language="json")
 
 
-refresh_jobs()
-
 st.title("Structured Output LLM Dashboard")
 st.caption("Trigger local LoRA training, evaluate the adapter, and compare against the golden set from one place.")
 
 autorefresh = st.toggle("Auto refresh every 5 seconds", value=True)
-if autorefresh:
-    st.markdown(
-        """
-        <script>
-        setTimeout(function() {
-          window.parent.location.reload();
-        }, 5000);
-        </script>
-        """,
-        unsafe_allow_html=True,
-    )
 
-with st.container(border=True):
-    training_job = get_job(TRAIN_JOB) or {}
-    training_preset = st.selectbox(
-        "Training preset",
-        options=list(TRAINING_PRESETS),
-        index=1,
-        format_func=lambda preset: f"{preset} - {PRESET_HELP[preset]}",
-    )
-    active_preset = training_job.get("env_overrides", {}).get("TRAINING_PRESET", training_preset)
-    st.caption(f"Active training preset for the next run: `{training_preset}`. Current job preset: `{active_preset}`.")
-    render_job_controls(
-        TRAIN_JOB,
-        "Training",
-        "Runs `scripts/run_training_local.sh` with the local config and the selected preset.",
-        {"TRAINING_PRESET": training_preset},
-    )
+@st.fragment(run_every="5s" if autorefresh else None)
+def render_dashboard() -> None:
+    refresh_jobs()
 
-with st.container(border=True):
-    render_job_controls(
-        EVAL_LOCAL_JOB,
-        "Local Evaluation",
-        "Evaluates the current adapter against the default local validation set.",
-    )
+    with st.container(border=True):
+        training_job = get_job(TRAIN_JOB) or {}
+        training_preset = st.selectbox(
+            "Training preset",
+            options=list(TRAINING_PRESETS),
+            index=1,
+            format_func=lambda preset: f"{preset} - {PRESET_HELP[preset]}",
+        )
+        active_preset = training_job.get("env_overrides", {}).get("TRAINING_PRESET", training_preset)
+        st.caption(f"Active training preset for the next run: `{training_preset}`. Current job preset: `{active_preset}`.")
+        render_job_controls(
+            TRAIN_JOB,
+            "Training",
+            "Runs `scripts/run_training_local.sh` with the local config and the selected preset.",
+            {"TRAINING_PRESET": training_preset},
+        )
 
-with st.container(border=True):
-    render_job_controls(
-        EVAL_GOLDEN_JOB,
-        "Golden Evaluation",
-        "Evaluates the current adapter against `data/golden/golden.jsonl`.",
-    )
+    with st.container(border=True):
+        render_job_controls(
+            EVAL_LOCAL_JOB,
+            "Local Evaluation",
+            "Evaluates the current adapter against the default local validation set.",
+        )
 
-left, right = st.columns(2)
-with left:
-    render_metrics("Latest Local Evaluation Report", LOCAL_REPORT_PATH)
-with right:
-    render_metrics("Latest Golden Evaluation Report", GOLDEN_REPORT_PATH)
+    with st.container(border=True):
+        render_job_controls(
+            EVAL_GOLDEN_JOB,
+            "Golden Evaluation",
+            "Evaluates the current adapter against `data/golden/golden.jsonl`.",
+        )
+
+    left, right = st.columns(2)
+    with left:
+        render_metrics("Latest Local Evaluation Report", LOCAL_REPORT_PATH)
+    with right:
+        render_metrics("Latest Golden Evaluation Report", GOLDEN_REPORT_PATH)
+
+
+render_dashboard()
