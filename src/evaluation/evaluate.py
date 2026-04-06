@@ -21,6 +21,12 @@ except ImportError:  # pragma: no cover - optional runtime dependency
 from src.evaluation.metrics import EvalMetrics
 from src.utils.config import load_yaml
 from src.utils.logging_utils import setup_logging
+from src.utils.runtime import (
+    log_accelerator_report,
+    recommend_model_name,
+    resolve_adapter_mode,
+    resolve_device,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +46,7 @@ def build_model_kwargs(model_cfg: dict) -> dict:
     kwargs = {
         "trust_remote_code": model_cfg.get("trust_remote_code", False),
     }
-    if model_cfg.get("load_in_4bit", False):
+    if model_cfg.get("adapter_mode") == "qlora" and model_cfg.get("load_in_4bit", False):
         quant_cfg = model_cfg.get("quantization", {})
         kwargs["quantization_config"] = {
             "load_in_4bit": True,
@@ -76,6 +82,11 @@ def main() -> None:
     model_cfg = load_yaml(args.model_config)
     train_cfg = load_yaml(args.training_config)
     schema_cfg = load_yaml(args.schema_config)
+    model_cfg = dict(model_cfg)
+    model_cfg["model_name"] = recommend_model_name(model_cfg)
+    model_cfg["adapter_mode"] = resolve_adapter_mode(model_cfg)
+    model_cfg["device_map"] = resolve_device(model_cfg)
+    log_accelerator_report(LOGGER, model_cfg, context="Evaluation")
 
     if mlflow:
         mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
@@ -92,6 +103,8 @@ def main() -> None:
         from transformers import BitsAndBytesConfig
 
         model_kwargs["quantization_config"] = BitsAndBytesConfig(**model_kwargs["quantization_config"])
+    elif model_cfg.get("device_map") == "mps":
+        model_kwargs["device_map"] = {"": "mps"}
     model = AutoModelForCausalLM.from_pretrained(model_cfg["model_name"], **model_kwargs)
 
     if Path(adapter_path).exists():

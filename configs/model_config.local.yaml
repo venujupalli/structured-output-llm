@@ -1,0 +1,22 @@
+model_name: auto
+default_model_name: Qwen/Qwen2.5-0.5B-Instruct
+cache_dir: ./.cache/huggingface
+adapter_mode: auto
+load_in_4bit: false
+device_map: auto
+trust_remote_code: false
+max_retries: 3
+retry_backoff_seconds: 2
+lora:
+  r: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+quantization:
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_compute_dtype: float32
+  bnb_4bit_use_double_quant: false

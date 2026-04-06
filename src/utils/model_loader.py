@@ -14,6 +14,7 @@ from huggingface_hub.errors import HfHubHTTPError, LocalEntryNotFoundError
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.utils.config import load_yaml
+from src.utils.runtime import recommend_model_name, resolve_adapter_mode, resolve_device
 
 
 @dataclass
@@ -29,11 +30,14 @@ class ModelLoaderConfig:
     @classmethod
     def from_yaml(cls, config_path: str | Path) -> "ModelLoaderConfig":
         data: Dict[str, Any] = load_yaml(config_path)
+        resolved_model_name = recommend_model_name(data)
+        resolved_adapter_mode = resolve_adapter_mode(data)
+        resolved_device_map = resolve_device(data)
         return cls(
-            model_name=data["model_name"],
+            model_name=resolved_model_name,
             cache_dir=data.get("cache_dir"),
-            load_in_4bit=bool(data.get("load_in_4bit", False)),
-            device_map=str(data.get("device_map", "auto")),
+            load_in_4bit=bool(data.get("load_in_4bit", False)) and resolved_adapter_mode == "qlora",
+            device_map=str(resolved_device_map),
             trust_remote_code=bool(data.get("trust_remote_code", False)),
             max_retries=int(data.get("max_retries", 3)),
             retry_backoff_seconds=int(data.get("retry_backoff_seconds", 2)),
@@ -138,10 +142,13 @@ class ModelLoader:
     def _load_model(self, model_source: str, cache_dir: Path):
         kwargs: Dict[str, Any] = {
             "cache_dir": str(cache_dir),
-            "device_map": self.config.device_map,
             "trust_remote_code": self.config.trust_remote_code,
             "local_files_only": True,
         }
+        if self.config.device_map == "mps":
+            kwargs["device_map"] = {"": "mps"}
+        else:
+            kwargs["device_map"] = self.config.device_map
 
         if self.config.load_in_4bit:
             kwargs["quantization_config"] = BitsAndBytesConfig(

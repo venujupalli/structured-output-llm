@@ -1,0 +1,13 @@
+preset_name: speed
+max_seq_length: 256
+num_train_epochs: 1
+gradient_accumulation_steps: 4
+learning_rate: 3e-4
+logging_steps: 5
+save_steps: 50
+warmup_ratio: 0.02
+dataset:
+  train_max_records: 250
+mlflow:
+  run_name: macbook-local-adapter-train-speed
+  eval_run_name: macbook-local-adapter-eval-speed

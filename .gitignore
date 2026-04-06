@@ -1,2 +1,12 @@
 __pycache__/
 *.pyc
+.cache/
+.venv/
+artifacts/
+src/__pycache__/
+src/data/__pycache__/
+src/evaluations/__pycache__/
+src/inference/__pycache__/
+src/training/__pycache__/
+src/ui/__pycache__/
+src/utils/__pycache__/

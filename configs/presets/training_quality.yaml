@@ -1,0 +1,14 @@
+preset_name: quality
+max_seq_length: 768
+num_train_epochs: 3
+gradient_accumulation_steps: 8
+learning_rate: 1.5e-4
+logging_steps: 10
+save_steps: 100
+warmup_ratio: 0.05
+eval_max_new_tokens: 96
+dataset:
+  train_max_records: 1000
+mlflow:
+  run_name: macbook-local-adapter-train-quality
+  eval_run_name: macbook-local-adapter-eval-quality

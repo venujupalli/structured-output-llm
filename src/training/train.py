@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import logging
 import os
 import random
@@ -9,13 +10,14 @@ from pathlib import Path
 import mlflow
 import numpy as np
 import torch
-from peft import LoraConfig
+from peft import LoraConfig, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 from trl import SFTTrainer
 
 from src.data.dataset import format_example, load_alpaca_dataset
 from src.utils.config import deep_merge, load_yaml
 from src.utils.logging_utils import setup_logging
+from src.utils.runtime import log_accelerator_report, recommend_model_name, resolve_adapter_mode, resolve_device
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,6 +54,92 @@ def build_quantization_config(model_cfg: dict) -> BitsAndBytesConfig | None:
     )
 
 
+def build_sft_trainer(
+    *,
+    model,
+    train_dataset,
+    peft_config: LoraConfig,
+    tokenizer,
+    training_args: TrainingArguments,
+    training_cfg: dict,
+) -> SFTTrainer:
+    signature = inspect.signature(SFTTrainer.__init__)
+    trainer_kwargs = {
+        "model": model,
+        "train_dataset": train_dataset,
+        "peft_config": peft_config,
+        "args": training_args,
+    }
+
+    if "tokenizer" in signature.parameters:
+        trainer_kwargs["tokenizer"] = tokenizer
+    elif "processing_class" in signature.parameters:
+        trainer_kwargs["processing_class"] = tokenizer
+
+    if "dataset_text_field" in signature.parameters:
+        trainer_kwargs["dataset_text_field"] = "text"
+
+    if "max_seq_length" in signature.parameters:
+        trainer_kwargs["max_seq_length"] = training_cfg["max_seq_length"]
+    elif "max_length" in signature.parameters:
+        trainer_kwargs["max_length"] = training_cfg["max_seq_length"]
+
+    if "packing" in signature.parameters:
+        trainer_kwargs["packing"] = training_cfg.get("packing", False)
+
+    if "dataset_kwargs" in signature.parameters:
+        trainer_kwargs["dataset_kwargs"] = {"skip_prepare_dataset": False}
+
+    return SFTTrainer(**trainer_kwargs)
+
+
+def normalize_training_config(training_cfg: dict) -> dict:
+    normalized = dict(training_cfg)
+    int_fields = [
+        "seed",
+        "max_seq_length",
+        "num_train_epochs",
+        "per_device_train_batch_size",
+        "gradient_accumulation_steps",
+        "logging_steps",
+        "save_steps",
+        "save_total_limit",
+        "eval_max_new_tokens",
+    ]
+    float_fields = [
+        "learning_rate",
+        "warmup_ratio",
+    ]
+    bool_fields = [
+        "bf16",
+        "fp16",
+        "packing",
+    ]
+
+    for field in int_fields:
+        if field in normalized:
+            normalized[field] = int(normalized[field])
+
+    for field in float_fields:
+        if field in normalized:
+            normalized[field] = float(normalized[field])
+
+    for field in bool_fields:
+        if field in normalized:
+            value = normalized[field]
+            if isinstance(value, str):
+                normalized[field] = value.strip().lower() in {"1", "true", "yes", "on"}
+            else:
+                normalized[field] = bool(value)
+
+    dataset_cfg = dict(normalized.get("dataset", {}))
+    if "train_max_records" in dataset_cfg:
+        dataset_cfg["train_max_records"] = int(dataset_cfg["train_max_records"])
+    normalized["dataset"] = dataset_cfg
+
+    return normalized
+
+
 def main() -> None:
     args = parse_args()
     setup_logging()
@@ -60,6 +148,12 @@ def main() -> None:
     training_cfg = load_yaml(args.training_config)
     if args.override_config:
         training_cfg = deep_merge(training_cfg, load_yaml(args.override_config))
+    training_cfg = normalize_training_config(training_cfg)
+    model_cfg = dict(model_cfg)
+    model_cfg["model_name"] = recommend_model_name(model_cfg)
+    model_cfg["adapter_mode"] = resolve_adapter_mode(model_cfg)
+    model_cfg["device_map"] = resolve_device(model_cfg)
+    log_accelerator_report(LOGGER, model_cfg, context="Training")
 
     seed = int(training_cfg.get("seed", 42))
     set_seed(seed)
@@ -73,6 +167,8 @@ def main() -> None:
         mlflow.log_params(
             {
                 "base_model": model_cfg["model_name"],
+                "adapter_mode": model_cfg["adapter_mode"],
+                "training_preset": training_cfg.get("preset_name", "custom"),
                 "learning_rate": training_cfg["learning_rate"],
                 "batch_size": training_cfg["per_device_train_batch_size"],
                 "gradient_accumulation_steps": training_cfg["gradient_accumulation_steps"],
@@ -83,7 +179,7 @@ def main() -> None:
             }
         )
 
-        bnb_config = build_quantization_config(model_cfg)
+        bnb_config = build_quantization_config(model_cfg) if model_cfg["adapter_mode"] == "qlora" else None
 
         tokenizer = AutoTokenizer.from_pretrained(model_cfg["model_name"], use_fast=True)
         if tokenizer.pad_token is None:
@@ -95,6 +191,8 @@ def main() -> None:
         if bnb_config is not None:
             model_kwargs["quantization_config"] = bnb_config
             model_kwargs["device_map"] = model_cfg.get("device_map", "auto")
+        elif model_cfg.get("device_map") == "mps":
+            model_kwargs["device_map"] = {"": "mps"}
         elif torch.cuda.is_available():
             model_kwargs["device_map"] = model_cfg.get("device_map", "auto")
 
@@ -102,6 +200,9 @@ def main() -> None:
             model_cfg["model_name"],
             **model_kwargs,
         )
+        if model_cfg["adapter_mode"] == "qlora":
+            model = prepare_model_for_kbit_training(model)
+        model.config.use_cache = False
 
         peft_config = LoraConfig(
             r=model_cfg["lora"]["r"],
@@ -113,7 +214,12 @@ def main() -> None:
         )
 
         train_dataset = load_alpaca_dataset(training_cfg["dataset"]["train_path"], split="train")
+        train_max_records = training_cfg["dataset"].get("train_max_records")
+        if train_max_records:
+            train_dataset = train_dataset.select(range(min(train_max_records, len(train_dataset))))
+            LOGGER.info("Training dataset limited to %d records", len(train_dataset))
         train_dataset = train_dataset.map(format_example, remove_columns=train_dataset.column_names)
+        LOGGER.info("Training preset: %s", training_cfg.get("preset_name", "custom"))
 
         output_dir = Path(training_cfg["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -132,19 +238,18 @@ def main() -> None:
             optim=training_cfg.get("optimizer", "paged_adamw_8bit"),
             lr_scheduler_type=training_cfg.get("lr_scheduler_type", "cosine"),
             warmup_ratio=training_cfg.get("warmup_ratio", 0.03),
+            dataloader_pin_memory=torch.cuda.is_available(),
             report_to=[],
             seed=seed,
         )
 
-        trainer = SFTTrainer(
+        trainer = build_sft_trainer(
             model=model,
             train_dataset=train_dataset,
             peft_config=peft_config,
-            dataset_text_field="text",
-            max_seq_length=training_cfg["max_seq_length"],
             tokenizer=tokenizer,
-            args=training_args,
-            packing=training_cfg.get("packing", False),
+            training_args=training_args,
+            training_cfg=training_cfg,
         )
 
         trainer.train(resume_from_checkpoint=args.resume_from_checkpoint)

@@ -1,0 +1,25 @@
+seed: 42
+output_dir: ./artifacts/local-model
+max_seq_length: 512
+num_train_epochs: 2
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 2e-4
+logging_steps: 10
+save_steps: 100
+save_total_limit: 1
+bf16: false
+fp16: false
+optimizer: adamw_torch
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+packing: false
+eval_max_new_tokens: 64
+dataset:
+  train_path: ./data/synthetic/train.jsonl
+  train_max_records: 500
+  eval_path: ./data/synthetic/val.jsonl
+mlflow:
+  experiment_name: structured-output-llm-local
+  run_name: macbook-local-adapter-train
+  eval_run_name: macbook-local-adapter-eval

@@ -186,8 +186,49 @@ make clean-all NAMESPACE=<namespace> \
 If you want to test outside Kubernetes first:
 
 ```bash
-bash scripts/run_training.sh
-bash scripts/run_evaluation.sh
+uv sync
+bash scripts/run_training_local.sh
+bash scripts/run_evaluation_local.sh
 ```
 
-These scripts read config paths from environment variables and use defaults under `configs/`.
+The local training and evaluation scripts use `uv run` with Mac-friendly defaults under `configs/model_config.local.yaml` and `configs/training_config.local.yaml`.
+
+You can choose a local training preset with `TRAINING_PRESET`:
+
+```bash
+TRAINING_PRESET=speed bash scripts/run_training_local.sh
+TRAINING_PRESET=balanced bash scripts/run_training_local.sh
+TRAINING_PRESET=quality bash scripts/run_training_local.sh
+```
+
+`balanced` is the default preset when `TRAINING_PRESET` is not set.
+
+### Local model/adaptor defaults
+
+For local MacBook runs, `configs/model_config.local.yaml` now uses `model_name: auto` and `adapter_mode: auto`.
+
+- On macOS, the project picks a Qwen2.5 Instruct model tier based on available system memory:
+  - up to 12 GB: `Qwen/Qwen2.5-0.5B-Instruct`
+  - 12 GB to 24 GB: `Qwen/Qwen2.5-1.5B-Instruct`
+  - above 24 GB: `Qwen/Qwen2.5-3B-Instruct`
+- On Apple Silicon / non-CUDA local setups, the project uses LoRA by default.
+- On CUDA setups with `bitsandbytes` available, `adapter_mode: auto` upgrades to QLoRA automatically.
+
+This avoids the unsupported 4-bit `bitsandbytes` path on most MacBook environments while still letting GPU environments use QLoRA.
+
+### Local UI
+
+To launch a minimal Streamlit dashboard for local training and evaluation:
+
+```bash
+UV_CACHE_DIR=.cache/uv uv sync
+bash scripts/run_ui.sh
+```
+
+The dashboard lets you:
+
+- trigger local training
+- run local evaluation on the default validation set
+- run evaluation on the golden set at `data/golden/golden.jsonl`
+- tail recent logs for each job
+- inspect the latest local and golden evaluation reports

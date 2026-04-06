@@ -1,0 +1,13 @@
+preset_name: balanced
+max_seq_length: 512
+num_train_epochs: 2
+gradient_accumulation_steps: 8
+learning_rate: 2e-4
+logging_steps: 10
+save_steps: 100
+warmup_ratio: 0.03
+dataset:
+  train_max_records: 500
+mlflow:
+  run_name: macbook-local-adapter-train-balanced
+  eval_run_name: macbook-local-adapter-eval-balanced

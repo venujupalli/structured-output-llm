@@ -1,0 +1,25 @@
+[project]
+name = "structured-output-llm"
+version = "0.1.0"
+description = "Structured output LLM training and evaluation utilities"
+requires-python = ">=3.11"
+dependencies = [
+  "accelerate",
+  "datasets",
+  "jsonschema",
+  "mlflow",
+  "numpy",
+  "peft",
+  "pyyaml",
+  "streamlit",
+  "torch",
+  "transformers",
+  "trl",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = false
